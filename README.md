@@ -1,12 +1,15 @@
-# Family Life Planner - README
+# FIRE & Die-with-Zero Lifetime Planner
 
-家庭生活規画 | 50年先までの資産シミュレーション
+个人/家庭 50 年 Lifetime Plan（Sample-first + 渐进式输入）
 
-## 🎯 機能
+## 🎯 MVP 功能
 
-- **基本設定**: 家族情報、資産、収入、支出、税率などを設定
-- **ライフイベント**: 教育費、住宅購入、副業収入などのイベントを管理
-- **シミュレーション**: 50年間の資産推移、収支、高齢期分析をグラフで可視化
+- **Sample Gallery（10 个案例）**: 首页无需输入直接查看案例卡
+- **Case Detail**: 每个案例可查看年度表 + 图表 + 结论
+- **My Plan**: 通过 3–5 个快速问题生成个人版，并可继续编辑参数和事件
+- **Import**: 支持 CSV 支出导入、JSON 导入/导出
+- **Scenario A/B**: 支持复制并做简易 what-if 对比
+- **LocalStorage**: 默认本地保存（离线优先）
 
 ## 🚀 起動方法
 
@@ -21,6 +24,14 @@ npm run dev
 npm run build
 ```
 
+## 🧭 路由
+
+- `/` Sample Gallery
+- `/case/:id` Case Detail
+- `/plan` My Plan
+- `/import` Import / Export
+- `/about` Method
+
 ## 📦 Cloudflare Pages デプロイ
 
 1. GitHubにプッシュ
@@ -30,29 +41,30 @@ npm run build
    - Build output: `dist`
    - Node version: 18以上
 
-## 🗂 プロジェクト構成
+## 🗂 项目结构（核心）
 
 ```
 life-planner/
-├── index.html          # メインHTML
-├── package.json        # 依存関係
-├── vite.config.js      # Viteビルド設定
+├── public/_redirects   # Cloudflare Pages SPA fallback
+├── index.html
+├── package.json
 ├── src/
-│   ├── main.js         # アプリケーションエントリー
+│   ├── main.jsx
 │   ├── data/
-│   │   ├── defaults.js # デフォルト設定
-│   │   └── events.js   # デフォルトイベント
+│   │   ├── defaults.js
+│   │   └── cases.json
 │   ├── engine/
-│   │   └── calculator.js # 計算エンジン
+│   │   ├── calculator.js
+│   │   └── scenario.js
+│   ├── parser/
+│   │   └── importCsv.js
+│   ├── storage/
+│   │   └── local.js
 │   ├── components/
-│   │   ├── SetupForm.js  # 設定フォーム
-│   │   ├── EventsForm.js # イベント管理
-│   │   └── Charts.js     # グラフ描画
-│   └── styles/
-│       └── main.css      # スタイル
-└── dist/               # ビルド出力
+│   │   ├── ResultsPage.js
+│   │   ├── ProjectionTable.js
+│   │   ├── Charts.js
+│   │   └── EventsForm.js
+│   └── styles/main.css
+└── dist/
 ```
-
-## 💾 データ保存
-
-データはブラウザのLocalStorageに自動保存されます。

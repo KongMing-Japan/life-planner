@@ -3,9 +3,12 @@ export const defaultSetup = {
     // 基本设置
     Start_Year: 2025,
     Years: 50,
+    End_Age: 95,
     Initial_Asset: 100000000,
     Invest_Return: 0.05,
     Inflation: 0.02,
+    Safety_Buffer_Years: 1,
+    Income_Is_After_Tax: false,
 
     // 家庭成员信息 - 本人 (Person 1)
     Person1_Birth_Year: 1981,
@@ -48,9 +51,11 @@ export const setupFields = [
         group: 'Basic Config', fields: [
             { key: 'Start_Year', label: 'Start Year', type: 'number', unit: '' },
             { key: 'Years', label: 'Duration', type: 'number', unit: 'Years' },
+            { key: 'End_Age', label: 'Plan End Age', type: 'number', unit: 'Age' },
             { key: 'Initial_Asset', label: 'Initial Assets', type: 'currency', scale: 10000, suffix: '万' },
             { key: 'Invest_Return', label: 'Inv. Return', type: 'percent' },
             { key: 'Inflation', label: 'Inflation', type: 'percent' },
+            { key: 'Safety_Buffer_Years', label: 'Safety Buffer', type: 'number', unit: 'Years' },
         ]
     },
     {

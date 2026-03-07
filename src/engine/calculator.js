@@ -1,220 +1,244 @@
 /**
- * 家庭财务计算引擎
- * 基于用户提供的Excel公式进行实现
+ * Deterministic yearly planning engine for FIRE + Die With Zero.
+ * All functions are pure and side-effect free.
  */
 
-/**
- * 计算某年的总收入
- * @param {number} year - 年份
- * @param {object} setup - 家庭基本设置
- * @param {array} events - 生活事件列表
- * @returns {number} 总收入（正数）
- */
+function activeEventAmount(event, year) {
+  return year >= event.year && year < event.year + (event.duration || 1) ? event.amount : 0;
+}
+
+function getCurrentYear() {
+  return new Date().getFullYear();
+}
+
 export function calculateIncome(year, setup, events) {
-    let income = 0;
+  const p1RetireYear = setup.Person1_Birth_Year + setup.Person1_Retire_Age;
+  const p2RetireYear = setup.Person2_Birth_Year + setup.Person2_Retire_Age;
 
-    // 退休前工资收入 (Decoupled)
-    const p1RetireYear = setup.Person1_Birth_Year + setup.Person1_Retire_Age;
-    const p2RetireYear = setup.Person2_Birth_Year + setup.Person2_Retire_Age;
+  let salaryIncome = 0;
+  if (year < p1RetireYear) salaryIncome += setup.Person1_Salary_Start || 0;
+  if (year < p2RetireYear) salaryIncome += setup.Person2_Salary_Start || 0;
 
-    if (year < p1RetireYear) {
-        income += setup.Person1_Salary_Start || 0;
-    }
-    if (year < p2RetireYear) {
-        income += setup.Person2_Salary_Start || 0;
-    }
+  let pensionIncome = 0;
+  const p1Age = year - setup.Person1_Birth_Year;
+  const p2Age = year - setup.Person2_Birth_Year;
+  if (p1Age >= (setup.Person1_Pension_Start_Age || setup.Person1_Retire_Age || 65)) {
+    pensionIncome += setup.Person1_Pension_Income || 0;
+  }
+  if (p2Age >= (setup.Person2_Pension_Start_Age || setup.Person2_Retire_Age || 65)) {
+    pensionIncome += setup.Person2_Pension_Income || 0;
+  }
 
-    // 养老金收入 (Decoupled)
-    const person1Age = year - setup.Person1_Birth_Year;
-    const person2Age = year - setup.Person2_Birth_Year;
+  let eventIncome = 0;
+  for (const event of events) {
+    const amount = activeEventAmount(event, year);
+    if (amount > 0) eventIncome += amount;
+  }
 
-    if (person1Age >= setup.Person1_Pension_Start_Age) {
-        income += setup.Person1_Pension_Income || 0;
-    }
-    if (person2Age >= setup.Person2_Pension_Start_Age) {
-        income += setup.Person2_Pension_Income || 0;
-    }
+  return salaryIncome + pensionIncome + eventIncome;
+}
 
-    // 正向生活事件
-    for (const event of events) {
-        if (event.amount > 0 && year >= event.year && year < event.year + event.duration) {
-            income += event.amount;
-        }
-    }
+function calculateBaseExpense(year, setup) {
+  const startYear = setup.Start_Year || getCurrentYear();
+  const inflation = setup.Inflation || 0;
+  const yearsFromStart = Math.max(0, year - startYear);
+  const inflator = (1 + inflation) ** yearsFromStart;
 
-    return income;
+  const householdRetireYear = Math.min(
+    setup.Person1_Birth_Year + setup.Person1_Retire_Age,
+    setup.Person2_Birth_Year + setup.Person2_Retire_Age
+  );
+
+  const living = year < householdRetireYear ? (setup.Living_Annual_Pre || 0) : (setup.Living_Annual_Post || 0);
+  const housing = year < householdRetireYear ? (setup.Housing_Annual_Pre || 0) : (setup.Housing_Annual_Post || 0);
+  const travel = setup.Travel_Annual || 0;
+
+  let medical = 0;
+  const p1Age = year - setup.Person1_Birth_Year;
+  const p2Age = year - setup.Person2_Birth_Year;
+  if (p1Age >= (setup.Person1_Medical_Start_Age || 70)) medical += setup.Person1_Medical_Annual || 0;
+  if (p2Age >= (setup.Person2_Medical_Start_Age || 70)) medical += setup.Person2_Medical_Annual || 0;
+
+  return (living + housing + travel + medical) * inflator;
 }
 
 export function calculateExpense(year, setup, events) {
-    let expense = 0;
+  let eventExpense = 0;
+  for (const event of events) {
+    const amount = activeEventAmount(event, year);
+    if (amount < 0) eventExpense += Math.abs(amount);
+  }
 
-    // 住房和生活支出 (Based on oldest person's retirement status? Or average? 
-    // HeHe: Excel used global Retire_Year. Let's use P1's retirement as primary for household transition)
-    const p1RetireYear = setup.Person1_Birth_Year + setup.Person1_Retire_Age;
-
-    if (year < p1RetireYear) {
-        expense += (setup.Housing_Annual_Pre || 0) + (setup.Living_Annual_Pre || 0);
-    } else {
-        expense += (setup.Housing_Annual_Post || 0) + (setup.Living_Annual_Post || 0);
-    }
-
-    // 旅游支出
-    expense += setup.Travel_Annual || 0;
-
-    // 医疗支出 (Decoupled)
-    const person1Age = year - setup.Person1_Birth_Year;
-    const person2Age = year - setup.Person2_Birth_Year;
-
-    if (person1Age >= setup.Person1_Medical_Start_Age) {
-        expense += setup.Person1_Medical_Annual || 0;
-    }
-    if (person2Age >= setup.Person2_Medical_Start_Age) {
-        expense += setup.Person2_Medical_Annual || 0;
-    }
-
-    // 负向生活事件 (Events are still stored as negative values, so we convert to positive expense)
-    for (const event of events) {
-        if (event.amount < 0 && year >= event.year && year < event.year + event.duration) {
-            expense += Math.abs(event.amount);
-        }
-    }
-
-    return expense;
+  return calculateBaseExpense(year, setup) + eventExpense;
 }
 
 export function calculateTax(year, setup, events) {
-    let tax = 0;
-
-    const p1RetireYear = setup.Person1_Birth_Year + setup.Person1_Retire_Age;
-    const p2RetireYear = setup.Person2_Birth_Year + setup.Person2_Retire_Age;
-
-    // 工资所得税 (Individual)
-    if (year < p1RetireYear) {
-        tax -= (setup.Person1_Salary_Start || 0) * setup.Income_Tax_Rate;
-    }
-    if (year < p2RetireYear) {
-        tax -= (setup.Person2_Salary_Start || 0) * setup.Income_Tax_Rate;
-    }
-
-    // 养老金税 (Individual)
-    const person1Age = year - setup.Person1_Birth_Year;
-    const person2Age = year - setup.Person2_Birth_Year;
-
-    if (person1Age >= setup.Person1_Pension_Start_Age) {
-        tax -= (setup.Person1_Pension_Income || 0) * (setup.Pension_Tax_Rate || 0);
-    }
-    if (person2Age >= setup.Person2_Pension_Start_Age) {
-        tax -= (setup.Person2_Pension_Income || 0) * (setup.Pension_Tax_Rate || 0);
-    }
-
-    // 正向事件课税
-    for (const event of events) {
-        if (event.amount > 0 && year >= event.year && year < event.year + event.duration) {
-            tax -= event.amount * setup.Events_Tax_Rate;
-        }
-    }
-
-    return tax;
+  if (setup.Income_Is_After_Tax) return 0;
+  const effectiveRate = setup.Income_Tax_Rate || 0;
+  return calculateIncome(year, setup, events) * effectiveRate;
 }
 
 export function calculateNetCashFlow(year, setup, events) {
-    const income = calculateIncome(year, setup, events);
-    const expense = calculateExpense(year, setup, events);
-    const tax = calculateTax(year, setup, events);
-
-    // Income is (+), Expense is (+ magnitude), Tax is (-)
-    return income - expense + tax;
+  const grossIncome = calculateIncome(year, setup, events);
+  const tax = calculateTax(year, setup, events);
+  const expense = calculateExpense(year, setup, events);
+  return grossIncome - tax - expense;
 }
 
-/**
- * Ensure simulation covers up to age 90 for the youngest spouse
- * @param {object} setup
- * @returns {number} Adjusted years
- */
 export function calculateProjectionYears(setup) {
-    const currentYear = new Date().getFullYear();
-    const startYear = setup.Start_Year || currentYear;
-
-    // Calculate ages in start year
-    const p1Age = startYear - setup.Person1_Birth_Year;
-    const p2Age = startYear - setup.Person2_Birth_Year;
-
-    const youngestAge = Math.min(p1Age, p2Age);
-    const yearsTo90 = 90 - youngestAge;
-
-    // Ensure at least 50 years or up to 90, whichever is longer, allowing user override if larger
-    const minYears = Math.max(50, yearsTo90);
-
-    // If setup.Years is manually set higher, keep it, otherwise ensure coverage
-    return Math.max(setup.Years || 0, minYears);
+  const startYear = setup.Start_Year || getCurrentYear();
+  const endAge = setup.End_Age || 95;
+  const p1Years = endAge - (startYear - setup.Person1_Birth_Year);
+  const p2Years = endAge - (startYear - setup.Person2_Birth_Year);
+  const minYears = Math.max(1, Math.max(p1Years, p2Years));
+  return Math.max(setup.Years || 0, minYears);
 }
 
-/**
- * 生成完整的预测数据 (Auto-extends to age 90)
- * @param {object} setup - 家庭基本设置
- * @param {array} events - 生活事件列表
- * @returns {array} 每年的财务数据
- */
 export function generateProjection(setup, events) {
-    const projection = [];
-    let currentAsset = setup.Initial_Asset;
-    const realReturnRate = (1 + setup.Invest_Return) / (1 + setup.Inflation);
+  const projection = [];
+  const years = calculateProjectionYears(setup);
+  const startYear = setup.Start_Year || getCurrentYear();
+  const returnRate = setup.Invest_Return || 0;
+  const safetyBufferYears = setup.Safety_Buffer_Years || 1;
 
-    const totalYears = calculateProjectionYears(setup);
+  let assets = setup.Initial_Asset || 0;
 
-    for (let i = 0; i < totalYears; i++) {
-        const year = setup.Start_Year + i;
-        const income = calculateIncome(year, setup, events);
-        const expense = calculateExpense(year, setup, events);
-        const tax = calculateTax(year, setup, events);
-        const netCashFlow = income + expense + tax;
+  for (let i = 0; i < years; i++) {
+    const year = startYear + i;
+    const age1 = year - setup.Person1_Birth_Year;
+    const age2 = year - setup.Person2_Birth_Year;
 
-        // 资产增长：考虑投资回报和通胀
-        currentAsset = currentAsset * realReturnRate + netCashFlow;
+    const grossIncome = calculateIncome(year, setup, events);
+    const tax = calculateTax(year, setup, events);
+    const totalIncome = grossIncome - tax;
+    const totalExpense = calculateExpense(year, setup, events);
+    const cashFlow = totalIncome - totalExpense;
 
-        const person1Age = year - setup.Person1_Birth_Year;
-        const person2Age = year - setup.Person2_Birth_Year;
-        const childAge = year - setup.Child1_Birth_Year;
+    const startAssets = assets;
+    const investmentGain = (startAssets + cashFlow) * returnRate;
+    const endAssets = startAssets + cashFlow + investmentGain;
+    assets = endAssets;
 
-        projection.push({
-            year,
-            person1Age,
-            person2Age,
-            childAge,
-            income,
-            expense,
-            tax,
-            netCashFlow,
-            asset: currentAsset,
-        });
-    }
+    const eventNotes = events
+      .filter((event) => activeEventAmount(event, year) !== 0)
+      .map((event) => event.note || 'Event');
 
-    return projection;
+    const safetyLine = totalExpense * safetyBufferYears;
+    const risk = endAssets < 0 ? 'red' : endAssets < safetyLine ? 'yellow' : 'green';
+
+    projection.push({
+      year,
+      person1Age: age1,
+      person2Age: age2,
+      childAge: year - (setup.Child1_Birth_Year || year),
+      grossIncome,
+      tax,
+      totalIncome,
+      income: totalIncome,
+      totalExpense,
+      expense: totalExpense,
+      cashFlow,
+      netCashFlow: cashFlow,
+      startAssets,
+      investmentGain,
+      endAssets,
+      asset: endAssets,
+      age1,
+      age2,
+      events: eventNotes,
+      risk,
+    });
+  }
+
+  return projection;
 }
 
-/**
- * 格式化日元货币
- * @param {number} value - 金额
- * @returns {string} 格式化后的字符串
- */
+function findRetireAsset(projection, retireYear) {
+  const row = projection.find((p) => p.year === retireYear);
+  return row ? row.endAssets : null;
+}
+
+function recommendRetireAge(setup, events) {
+  const currentAge = (setup.Start_Year || getCurrentYear()) - setup.Person1_Birth_Year;
+  const maxAge = 75;
+
+  for (let age = Math.max(currentAge, 45); age <= maxAge; age++) {
+    const candidate = {
+      ...setup,
+      Person1_Retire_Age: age,
+      Person2_Retire_Age: Math.max(45, age - (setup.Person1_Birth_Year - setup.Person2_Birth_Year)),
+    };
+    const projection = generateProjection(candidate, events);
+    const bankrupt = projection.some((p) => p.endAssets < 0);
+    if (!bankrupt) return age;
+  }
+
+  return null;
+}
+
+export function summarizeProjection(projection, setup, events) {
+  if (!projection.length) {
+    return {
+      plannedRetireAge: setup.Person1_Retire_Age,
+      recommendedRetireAge: null,
+      retireYear: null,
+      retireAsset: 0,
+      minAssetYear: null,
+      minAsset: 0,
+      terminalAsset: 0,
+      maxDeficitYear: null,
+      maxDeficitAmount: 0,
+      dieWithZeroStatus: '偏低(破产)',
+      hasBankruptcy: true,
+    };
+  }
+
+  const plannedRetireAge = setup.Person1_Retire_Age;
+  const retireYear = setup.Person1_Birth_Year + plannedRetireAge;
+  const retireAsset = findRetireAsset(projection, retireYear);
+
+  const minRow = projection.reduce((acc, row) => (row.endAssets < acc.endAssets ? row : acc), projection[0]);
+  const deficitRow = projection.reduce((acc, row) => (row.cashFlow < acc.cashFlow ? row : acc), projection[0]);
+  const terminalRow = projection[projection.length - 1];
+  const hasBankruptcy = projection.some((row) => row.endAssets < 0);
+
+  const annualExpenseAtEnd = terminalRow.totalExpense || 1;
+  let dieWithZeroStatus = '偏高';
+  if (terminalRow.endAssets < 0) dieWithZeroStatus = '偏低(破产)';
+  else if (terminalRow.endAssets <= annualExpenseAtEnd) dieWithZeroStatus = '接近0';
+
+  return {
+    plannedRetireAge,
+    recommendedRetireAge: recommendRetireAge(setup, events),
+    retireYear,
+    retireAsset: retireAsset ?? terminalRow.endAssets,
+    minAssetYear: minRow.year,
+    minAsset: minRow.endAssets,
+    terminalYear: terminalRow.year,
+    terminalAsset: terminalRow.endAssets,
+    maxDeficitYear: deficitRow.year,
+    maxDeficitAmount: deficitRow.cashFlow,
+    dieWithZeroStatus,
+    hasBankruptcy,
+  };
+}
+
+export function buildPlanOutput(setup, events) {
+  const projection = generateProjection(setup, events);
+  const summary = summarizeProjection(projection, setup, events);
+  return { projection, summary };
+}
+
 export function formatCurrency(value) {
-    const absValue = Math.abs(value);
-    const sign = value < 0 ? '-' : '';
+  const num = Number(value || 0);
+  const abs = Math.abs(num);
+  const sign = num < 0 ? '-' : '';
 
-    if (absValue >= 100000000) {
-        return sign + '¥' + (absValue / 100000000).toFixed(2) + '億';
-    } else if (absValue >= 10000) {
-        return sign + '¥' + (absValue / 10000).toFixed(0) + '万';
-    } else {
-        return sign + '¥' + absValue.toLocaleString('ja-JP');
-    }
+  if (abs >= 100000000) return `${sign}¥${(abs / 100000000).toFixed(2)}億`;
+  if (abs >= 10000) return `${sign}¥${(abs / 10000).toFixed(0)}万`;
+  return `${sign}¥${Math.round(abs).toLocaleString('ja-JP')}`;
 }
 
-/**
- * 格式化百分比
- * @param {number} value - 小数形式的百分比
- * @returns {string} 格式化后的字符串
- */
 export function formatPercent(value) {
-    return (value * 100).toFixed(1) + '%';
+  return `${((value || 0) * 100).toFixed(1)}%`;
 }

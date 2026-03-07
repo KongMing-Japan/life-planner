@@ -4,11 +4,8 @@
  */
 
 // Use local proxy to keep API Key secure on server side
-// The key VITE_GROQ_API_KEY should be set in Cloudflare Pages Environment Variables
+// Set GROQ_API_KEY in Cloudflare Pages environment variables (Functions runtime).
 const API_URL = '/api/chat';
-
-// No key needed on frontend!
-const GROQ_API_KEY = '';
 
 const MODELS = [
     'qwen/qwen-2.5-32b',

@@ -4,8 +4,8 @@
  */
 export async function onRequestPost({ request, env }) {
     try {
-        // Check for API Key in environment variables
-        const apiKey = env.VITE_GROQ_API_KEY;
+        // Server-side secret only. Keep legacy fallback for existing deployments.
+        const apiKey = env.GROQ_API_KEY || env.VITE_GROQ_API_KEY;
         if (!apiKey) {
             return new Response(JSON.stringify({ error: 'Server configuration error: API Key missing' }), {
                 status: 500,
