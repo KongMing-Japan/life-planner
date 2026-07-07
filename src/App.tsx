@@ -3,6 +3,7 @@ import { useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { Dashboard } from './components/Dashboard'
 import { InputPanel } from './components/InputPanel'
 import { ToolsDrawer } from './components/ToolsDrawer'
+import { ChatAssistant } from './components/ChatAssistant'
 import { buildPlanOutput } from './engine/planner'
 import { getCopy, locales, type Locale } from './i18n'
 import { loadPlan, savePlan } from './storage/plannerStorage'
@@ -57,6 +58,7 @@ export default function App() {
 
       <footer><p>{copy.disclaimer}</p><span>Life Planner v2 · {copy.localSave}</span></footer>
       <ToolsDrawer open={toolsOpen} plan={plan} scenario={scenario} locale={locale} copy={copy} onClose={() => setToolsOpen(false)} onPlanChange={setPlan} onScenarioChange={setScenario} />
+      <ChatAssistant plan={plan} locale={locale} copy={copy} onChange={setPlan} />
     </div>
   )
 }

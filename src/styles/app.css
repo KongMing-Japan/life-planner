@@ -145,7 +145,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .event-type-toggle button.active { background: var(--blue-50); color: var(--blue-700); }
 .event-name { display: grid; gap: .25rem; }
 .event-fields { display: grid; grid-template-columns: 1.05fr .75fr 1.2fr; gap: .38rem; margin-top: .45rem; }
-.event-editor-simple .event-fields { grid-template-columns: 1fr 1.25fr; }
 .event-meta { display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: .45rem; margin-top: .45rem; }
 .event-meta > label:not(.check-field) { display: grid; gap: .25rem; }
 .check-field { display: flex; min-height: 2rem; align-items: center; gap: .35rem; color: #52657d; font-size: .56rem; }
@@ -289,7 +288,6 @@ footer p { margin: 0; }
   .field-grid.two, .event-meta { grid-template-columns: 1fr; }
   .quick-grid, .quick-spouse { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .event-fields { grid-template-columns: 1fr 1fr; }
-  .event-editor-simple .event-fields { grid-template-columns: 1fr 1.2fr; }
   .event-fields .field:last-child { grid-column: 1 / -1; }
   .kpi-card strong { font-size: .84rem; }
   .wealth-chart { height: 250px; }
@@ -305,3 +303,254 @@ footer p { margin: 0; }
   .wealth-chart { height: 310px; }
   .cashflow-chart { height: 170px; }
 }
+
+/* ========================================
+   AI Chat Assistant (Floating Widget)
+   ======================================== */
+.ai-assistant-fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue-600) 0%, var(--blue-900) 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 8px 24px rgba(10, 107, 242, 0.3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+}
+
+.ai-assistant-fab:hover {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 12px 30px rgba(10, 107, 242, 0.45);
+}
+
+.ai-assistant-fab svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.ai-assistant-fab .ai-badge {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--teal);
+  border: 1.5px solid white;
+}
+
+.ai-assistant-panel {
+  position: fixed;
+  bottom: 6rem;
+  right: 2rem;
+  width: 375px;
+  max-width: calc(100vw - 4rem);
+  height: 520px;
+  max-height: calc(100vh - 8rem);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(188, 212, 242, 0.6);
+  border-radius: 1rem;
+  box-shadow: 0 16px 40px rgba(13, 35, 68, 0.12);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(20px) scale(0.95);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ai-assistant-panel.open {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ai-panel-header {
+  background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-950) 100%);
+  color: white;
+  padding: .9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-panel-header h3 {
+  margin: 0;
+  font-size: .88rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.ai-panel-header h3 svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ai-panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.ai-panel-header-actions button {
+  background: transparent;
+  border: 0;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  display: flex;
+  padding: .3rem;
+  border-radius: .25rem;
+  transition: all 0.2s;
+}
+
+.ai-panel-header-actions button:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.ai-panel-header-actions button svg {
+  width: .9rem;
+  height: .9rem;
+}
+
+.ai-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+.ai-message {
+  max-width: 85%;
+  padding: .65rem .85rem;
+  border-radius: .75rem;
+  font-size: .64rem;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.ai-message.assistant {
+  align-self: flex-start;
+  background: var(--blue-50);
+  color: var(--blue-950);
+  border-bottom-left-radius: .2rem;
+  border: 1px solid rgba(10, 107, 242, 0.08);
+}
+
+.ai-message.user {
+  align-self: flex-end;
+  background: var(--blue-600);
+  color: white;
+  border-bottom-right-radius: .2rem;
+}
+
+.ai-message.system-status {
+  align-self: center;
+  background: transparent;
+  color: var(--muted);
+  font-size: .52rem;
+  max-width: 100%;
+  padding: 0;
+}
+
+.ai-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .38rem;
+  padding: .5rem 1rem;
+  border-top: 1px solid rgba(188, 212, 242, 0.3);
+  background: rgba(247, 249, 252, 0.6);
+}
+
+.ai-chip {
+  background: white;
+  border: 1px solid #dce5ef;
+  border-radius: 99px;
+  padding: .35rem .6rem;
+  font-size: .54rem;
+  color: #53677f;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ai-chip:hover {
+  background: var(--blue-50);
+  color: var(--blue-700);
+  border-color: #bcd4f2;
+}
+
+.ai-chat-input-area {
+  display: flex;
+  gap: .4rem;
+  padding: .75rem 1rem;
+  border-top: 1px solid rgba(188, 212, 242, 0.4);
+  background: white;
+}
+
+.ai-chat-input-area input {
+  flex: 1;
+  border: 1px solid #becbdd;
+  border-radius: .38rem;
+  padding: .52rem .65rem;
+  font-size: .64rem;
+  outline: none;
+}
+
+.ai-chat-input-area input:focus {
+  border-color: var(--blue-600);
+}
+
+.ai-chat-input-area button {
+  background: var(--blue-600);
+  color: white;
+  border: 0;
+  border-radius: .38rem;
+  padding: 0 .9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.ai-chat-input-area button:hover {
+  background: var(--blue-700);
+}
+
+.ai-chat-input-area button:disabled {
+  background: #becbdd;
+  cursor: not-allowed;
+}
+
+.ai-chat-input-area button svg {
+  width: .9rem;
+  height: .9rem;
+}
+
+@media (max-width: 480px) {
+  .ai-assistant-panel {
+    bottom: 0;
+    right: 0;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    max-width: 100vw;
+    border-radius: 0;
+  }
+}
+

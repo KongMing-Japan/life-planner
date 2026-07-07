@@ -1,9 +1,8 @@
-import { Download, FileJson, GitCompareArrows, RotateCcw, Upload, X } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { GitCompareArrows, RotateCcw, X } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { clonePlan, templates } from '../data/defaultPlan'
 import { buildPlanOutput } from '../engine/planner'
 import { formatMoney, type I18nCopy, type Locale } from '../i18n'
-import { exportPlan, importPlan } from '../storage/plannerStorage'
 import type { PlannerV2 } from '../types'
 
 type Props = {
@@ -17,17 +16,7 @@ type Props = {
   onScenarioChange: (plan: PlannerV2 | null) => void
 }
 
-const download = (name: string, content: string) => {
-  const url = URL.createObjectURL(new Blob([content], { type: 'application/json' }))
-  const anchor = document.createElement('a')
-  anchor.href = url
-  anchor.download = name
-  anchor.click()
-  URL.revokeObjectURL(url)
-}
-
 export function ToolsDrawer({ open, plan, scenario, locale, copy, onClose, onPlanChange, onScenarioChange }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null)
   const [message, setMessage] = useState('')
   const baseOutput = useMemo(() => buildPlanOutput(plan), [plan])
   const scenarioOutput = useMemo(() => scenario ? buildPlanOutput(scenario) : null, [scenario])
@@ -46,12 +35,7 @@ export function ToolsDrawer({ open, plan, scenario, locale, copy, onClose, onPla
       <button className={`drawer-backdrop ${open ? 'open' : ''}`} aria-label={copy.close} type="button" onClick={onClose} />
       <aside className={`tools-drawer ${open ? 'open' : ''}`} aria-hidden={!open}>
         <div className="drawer-head"><div><span>TOOLS</span><h2>{copy.tools}</h2></div><button aria-label={copy.close} type="button" onClick={onClose}><X /></button></div>
-
-        <section className="tool-section"><h3><FileJson />{copy.toolFiles}</h3><p>{copy.toolFilesHelp}</p>
-          <div className="tool-actions"><button type="button" onClick={() => download('life-planner-v2.json', exportPlan(plan))}><Download />{copy.exportJson}</button><button type="button" onClick={() => inputRef.current?.click()}><Upload />{copy.importJson}</button></div>
-          <input ref={inputRef} hidden type="file" accept="application/json,.json" onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; try { onPlanChange(importPlan(await file.text())); setMessage(copy.importSuccess); } catch { setMessage(copy.importFailed); } event.currentTarget.value = '' }} />
-          {message ? <small className="tool-message">{message}</small> : null}
-        </section>
+        {message ? <div style={{ margin: '0 1rem 1rem', padding: '0.5rem 0.8rem', background: 'var(--blue-50)', color: 'var(--blue-700)', border: '1px solid rgba(10,107,242,0.1)', borderRadius: '0.4rem', fontSize: '0.58rem', fontWeight: 600 }}>{message}</div> : null}
 
         <section className="tool-section"><h3><RotateCcw />{copy.templates}</h3><p>{copy.templatesHelp}</p><div className="template-list">{templates.map((template) => <button type="button" key={template.id} onClick={() => { onPlanChange(template.build()); setMessage(`${copy.templateLoaded}: ${template.name}`) }}><strong>{template.name}</strong><span>{copy.applyTemplate}</span></button>)}</div></section>
 

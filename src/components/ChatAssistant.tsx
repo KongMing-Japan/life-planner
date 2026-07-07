@@ -1,0 +1,358 @@
+import { MessageSquare, Send, Trash2, X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { type ChatMessage, sendMessage } from '../services/groqService'
+import type { I18nCopy, Locale } from '../i18n'
+import type { PlannerV2 } from '../types'
+
+type Props = {
+  plan: PlannerV2
+  locale: Locale
+  copy: I18nCopy
+  onChange: (plan: PlannerV2) => void
+}
+
+interface ChatHistoryItem {
+  id: string
+  role: 'user' | 'assistant' | 'system-status'
+  text: string
+}
+
+export function ChatAssistant({ plan, locale, copy, onChange }: Props) {
+  const [open, setOpen] = useState(false)
+  const [input, setInput] = useState('')
+  const [history, setHistory] = useState<ChatHistoryItem[]>([])
+  const [loading, setLoading] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Initialize greeting on mount or locale change
+  useEffect(() => {
+    const greetingText =
+      locale === 'zh'
+        ? '您好！我是您的 AI 财务助手。您可以直接输入您的基本情况（例如：“我35岁，年收600万，打算65岁退休”）或让我调整参数（例如：“把通胀率改为 2%”、“添加每年100万的教育费，持续10年”）。'
+        : locale === 'ja'
+          ? 'こんにちは！AIアシスタントです。あなたの状況（例：「私は35歳、年収600万、65歳退職予定」）を教えていただくか、「物価上昇率を2%に変更」「教育費として毎年100万円を10年間追加」などの調整を指示してください。'
+          : 'Hello! I am your AI Assistant. Tell me about your household (e.g., "I\'m 35 years old earning 6M, plan to retire at 65") or ask me to make changes (e.g., "Set inflation to 2%", "Add annual tuition of 1M for 10 years").'
+
+    setHistory([
+      {
+        id: 'welcome',
+        role: 'assistant',
+        text: greetingText,
+      },
+    ])
+  }, [locale])
+
+  // Scroll to bottom when history updates
+  useEffect(() => {
+    if (open) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [history, open])
+
+  const handleClearHistory = () => {
+    const greetingText =
+      locale === 'zh'
+        ? '已清空对话记录。请告诉我您想做哪些调整。'
+        : locale === 'ja'
+          ? '対話履歴をクリアしました。どのような調整を行いますか？'
+          : 'Conversation cleared. What changes would you like to make?'
+
+    setHistory([
+      {
+        id: `clear-${Date.now()}`,
+        role: 'assistant',
+        text: greetingText,
+      },
+    ])
+  }
+
+  const handleSend = async (messageText: string) => {
+    if (!messageText.trim() || loading) return
+
+    const userMsgId = `user-${Date.now()}`
+    const nextHistory = [
+      ...history,
+      { id: userMsgId, role: 'user' as const, text: messageText },
+    ]
+    setHistory(nextHistory)
+    setInput('')
+    setLoading(true)
+
+    // Build the system prompt detailing our v2 state structure
+    const systemPrompt = `You are a professional AI Financial Planner.
+The user is modeling their life plan (current year is ${plan.assumptions.startYear}).
+Your objective is to:
+1. Parse the user's message.
+2. Formulate a short, friendly response in their language (locale: ${locale}).
+3. Return the specific modifications that should be applied to their plan parameters in JSON format.
+
+You MUST reply with a single JSON object strictly matching this format (no other wrapper text outside the JSON code block):
+\`\`\`json
+{
+  "reply": "Friendly response string confirming what was changed...",
+  "updates": {
+    "assumptions": { // optional
+      "initialAssets": number,
+      "nominalReturn": number, // nominal return rate (e.g. 0.05 for 5%)
+      "inflation": number, // inflation rate (e.g. 0.02 for 2%)
+      "borrowingRate": number, // borrowing nominal rate (e.g. 0.04 for 4%)
+      "endAge": number // plan end age (e.g. 100)
+    },
+    "adults": [ // optional, if modifying people. Must match the array length or update specific fields
+      {
+        "id": "primary", // or "spouse"
+        "name": "string",
+        "currentAge": number,
+        "annualSalary": number,
+        "annualSalaryGrowth": number, // real growth rate (e.g. 0.01 for 1%)
+        "retireAge": number,
+        "pensionStartAge": number,
+        "annualPension": number,
+        "medicalStartAge": number,
+        "annualMedicalExpense": number
+      }
+    ],
+    "children": [ // optional, list of children
+      {
+        "id": "child-xxx", // or unique ID
+        "name": "string",
+        "currentAge": number
+      }
+    ],
+    "expenses": { // optional, annual household expenses
+      "housingBeforeRetirement": number,
+      "housingAfterRetirement": number,
+      "livingBeforeRetirement": number,
+      "livingAfterRetirement": number,
+      "annualTravel": number
+    },
+    "events": [ // optional, list of life events. Note: Tuition and mortgage should have a duration (e.g. 3 years, 4 years, 30 years)!
+      {
+        "id": "string", // Unique ID (e.g., 'event-tuition', 'event-xxx')
+        "name": "string", // Event name (e.g., "大学学费", "中学学费")
+        "memberId": "string" | null, // link to child or adult ID if applicable
+        "type": "income" | "expense",
+        "startYear": number,
+        "duration": number, // MUST specify the duration of years (e.g. 3 for high school, 4 for college, 30 for mortgage)
+        "annualAmount": number,
+        "taxable": boolean
+      }
+    ]
+  }
+}
+\`\`\`
+
+Here is the user's current planner plan state for reference (merge changes into this, or only supply the modified fields in the "updates" output):
+${JSON.stringify(plan, null, 2)}
+
+Strictly output valid JSON matching the format. Be precise about numbers, currency, and percentages (e.g. 2% = 0.02). Use ¥10,000 unit values correctly (e.g. 600万 = 6,000,000).`
+
+    try {
+      const chatMessages: ChatMessage[] = [
+        { role: 'system', content: systemPrompt },
+        ...nextHistory
+          .filter((item) => item.role !== 'system-status')
+          .slice(-6) // include up to last 6 messages
+          .map((item) => ({
+            role: item.role as 'user' | 'assistant',
+            content: item.text,
+          })),
+      ]
+
+      const response = await sendMessage(chatMessages)
+      const content = response.content.trim()
+
+      // Parse JSON from code block
+      const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
+      const jsonStr = jsonMatch ? jsonMatch[1] : content
+      const parsed = JSON.parse(jsonStr)
+
+      const replyText = parsed.reply || 'Updated successfully.'
+
+      // Apply updates to the plan
+      if (parsed.updates) {
+        const nextPlan = { ...plan }
+
+        if (parsed.updates.assumptions) {
+          nextPlan.assumptions = { ...nextPlan.assumptions, ...parsed.updates.assumptions }
+        }
+        if (parsed.updates.expenses) {
+          nextPlan.expenses = { ...nextPlan.expenses, ...parsed.updates.expenses }
+        }
+        if (parsed.updates.adults) {
+          // Merge adults by ID
+          nextPlan.adults = nextPlan.adults.map((adult) => {
+            const patch = parsed.updates.adults.find((a: any) => a.id === adult.id)
+            return patch ? { ...adult, ...patch } : adult
+          })
+          // If spouse added in payload but not in current list
+          const spousePatch = parsed.updates.adults.find((a: any) => a.id === 'spouse')
+          if (spousePatch && !nextPlan.adults.some((a) => a.id === 'spouse')) {
+            nextPlan.adults.push({
+              id: 'spouse',
+              role: 'spouse',
+              name: spousePatch.name || '配偶者',
+              currentAge: spousePatch.currentAge || 30,
+              annualSalary: spousePatch.annualSalary || 0,
+              annualSalaryGrowth: spousePatch.annualSalaryGrowth || 0,
+              retireAge: spousePatch.retireAge || 65,
+              pensionStartAge: spousePatch.pensionStartAge || 65,
+              annualPension: spousePatch.annualPension || 0,
+              medicalStartAge: spousePatch.medicalStartAge || 70,
+              annualMedicalExpense: spousePatch.annualMedicalExpense || 0,
+            })
+          }
+        }
+        if (parsed.updates.children) {
+          nextPlan.children = parsed.updates.children
+        }
+        if (parsed.updates.events) {
+          // If the AI returns a list of events, we replace or merge them
+          // Here we just replace the events with the list provided by AI, or merge new ones
+          // To be safe, if events array is supplied, replace it (since LLM has the context of all current events)
+          nextPlan.events = parsed.updates.events
+        }
+
+        onChange(nextPlan)
+      }
+
+      setHistory((prev) => [
+        ...prev,
+        { id: `ai-${Date.now()}`, role: 'assistant', text: replyText },
+      ])
+    } catch (error) {
+      console.error('AI error:', error)
+      const errorText =
+        locale === 'zh'
+          ? '抱歉，解析请求时出现错误。请重试。'
+          : locale === 'ja'
+            ? 'すみません、処理中にエラーが発生しました。もう一度入力してください。'
+            : 'Sorry, an error occurred while processing your request. Please try again.'
+      setHistory((prev) => [
+        ...prev,
+        { id: `error-${Date.now()}`, role: 'assistant', text: errorText },
+      ])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const chips =
+    locale === 'zh'
+      ? [
+          '我今年35岁年薪600万，配偶32岁年薪400万',
+          '把投资年化名义收益率改成 4.5%',
+          '从2032年开始，连续4年每年新增200万大学学费支出',
+          '设置计划至95岁，通胀率1.8%',
+        ]
+      : locale === 'ja'
+        ? [
+            '私は35歳年収600万、配偶者は32歳年収400万',
+            '運用利回りを4.5%に変更',
+            '2032年から4年間、毎年200万円の大学学費を追加',
+            '95歳まで試算、インフレ率1.8%',
+          ]
+        : [
+            'I am 35 with 6M income, spouse is 32 with 4M',
+            'Set return rate to 4.5%',
+            'Add 2M annual tuition for 4 years starting in 2032',
+            'Plan through 95 with 1.8% inflation',
+          ]
+
+  return (
+    <>
+      <button
+        className="ai-assistant-fab"
+        type="button"
+        title="AI Assistant"
+        onClick={() => setOpen(!open)}
+      >
+        <MessageSquare />
+        <span className="ai-badge" />
+      </button>
+
+      <div className={`ai-assistant-panel ${open ? 'open' : ''}`}>
+        <div className="ai-panel-header">
+          <h3>
+            <MessageSquare />
+            {locale === 'zh' ? 'AI 财务助手' : locale === 'ja' ? 'AIアシスタント' : 'AI Assistant'}
+          </h3>
+          <div className="ai-panel-header-actions">
+            <button
+              type="button"
+              title={locale === 'zh' ? '清空历史' : locale === 'ja' ? '履歴クリア' : 'Clear Chat'}
+              onClick={handleClearHistory}
+            >
+              <Trash2 />
+            </button>
+            <button
+              type="button"
+              title="Close"
+              onClick={() => setOpen(false)}
+            >
+              <X />
+            </button>
+          </div>
+        </div>
+
+        <div className="ai-chat-messages">
+          {history.map((msg) => (
+            <div
+              key={msg.id}
+              className={`ai-message ${msg.role}`}
+            >
+              {msg.text}
+            </div>
+          ))}
+          {loading && (
+            <div className="ai-message assistant">
+              <span className="ai-loading-dots">...</span>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className="ai-chips-container">
+          {chips.map((chip, i) => (
+            <button
+              key={i}
+              type="button"
+              className="ai-chip"
+              onClick={() => handleSend(chip)}
+            >
+              {chip}
+            </button>
+          ))}
+        </div>
+
+        <form
+          className="ai-chat-input-area"
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleSend(input)
+          }}
+        >
+          <input
+            type="text"
+            value={input}
+            disabled={loading}
+            placeholder={
+              locale === 'zh'
+                ? '修改参数，如：“将通胀率设为2%”'
+                : locale === 'ja'
+                  ? '「インフレ率を2%に」などと入力...'
+                  : 'Type instructions...'
+            }
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <button
+            type="submit"
+            disabled={loading || !input.trim()}
+          >
+            <Send />
+          </button>
+        </form>
+      </div>
+    </>
+  )
+}
