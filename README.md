@@ -1,70 +1,40 @@
-# FIRE & Die-with-Zero Lifetime Planner
+# Life Planner
 
-个人/家庭 50 年 Lifetime Plan（Sample-first + 渐进式输入）
+家庭生涯财富规划器：用今天的购买力，模拟从当前年龄到 100 岁的收入、支出、人生事件与资产变化。
 
-## 🎯 MVP 功能
+## 功能
 
-- **Sample Gallery（10 个案例）**: 首页无需输入直接查看案例卡
-- **Case Detail**: 每个案例可查看年度表 + 图表 + 结论
-- **My Plan**: 通过 3–5 个快速问题生成个人版，并可继续编辑参数和事件
-- **Import**: 支持 CSV 支出导入、JSON 导入/导出
-- **Scenario A/B**: 支持复制并做简易 what-if 对比
-- **LocalStorage**: 默认本地保存（离线优先）
+- 本人、可选配偶与多子女家庭模型
+- 工资、退休、养老金、医疗费和家庭支出
+- 可持续多年的收入或支出事件
+- 实际购买力资产曲线与年度收入/支出图
+- Die with Zero 状态、资金耗尽年龄和年度明细
+- 反推退休期不跌破零所需的最低收益率，以及接近零所需的退休年度支出调整额
+- 本地保存、v1 数据迁移、JSON 导入导出
+- 快速模板与独立的 A/B 情景比较
 
-## 🚀 起動方法
+## 本地运行
 
 ```bash
-# 依存関係インストール
 npm install
-
-# 開発サーバー起動
 npm run dev
+```
 
-# 本番ビルド
+## 验证
+
+```bash
+npm test
 npm run build
+npm audit
 ```
 
-## 🧭 路由
+## 计算口径
 
-- `/` Sample Gallery
-- `/case/:id` Case Detail
-- `/plan` My Plan
-- `/import` Import / Export
-- `/about` Method
+- 所有金额均按今天购买力表示；实际投资收益率为 `(1 + 名义收益率) / (1 + 通胀率) - 1`。
+- 年末资产为 `年初资产 + 年初资产收益 + 税后收入 - 支出`，当年现金流不参与当年投资收益。
+- 资产为负后使用实际借款利率计算资金成本，并继续模拟到终点年龄。
+- 每位成人独立计算工资、实际工资增长、退休、养老金和医疗费用；最后一位成人退休后切换家庭退休支出。
+- 工资、养老金和应税事件使用各自的有效税率。教育、住房、退休金等非固定现金流通过人生事件显式录入。
+- 模型为确定性规划工具，不模拟市场波动、寿命概率或日本逐级税制。
 
-## 📦 Cloudflare Pages デプロイ
-
-1. GitHubにプッシュ
-2. Cloudflare Pagesで新規プロジェクト作成
-3. 設定:
-   - Build command: `npm run build`
-   - Build output: `dist`
-   - Node version: 18以上
-
-## 🗂 项目结构（核心）
-
-```
-life-planner/
-├── public/_redirects   # Cloudflare Pages SPA fallback
-├── index.html
-├── package.json
-├── src/
-│   ├── main.jsx
-│   ├── data/
-│   │   ├── defaults.js
-│   │   └── cases.json
-│   ├── engine/
-│   │   ├── calculator.js
-│   │   └── scenario.js
-│   ├── parser/
-│   │   └── importCsv.js
-│   ├── storage/
-│   │   └── local.js
-│   ├── components/
-│   │   ├── ResultsPage.js
-│   │   ├── ProjectionTable.js
-│   │   ├── Charts.js
-│   │   └── EventsForm.js
-│   └── styles/main.css
-└── dist/
-```
+应用为离线优先的单页前端，不包含账号、数据库或云端同步。
