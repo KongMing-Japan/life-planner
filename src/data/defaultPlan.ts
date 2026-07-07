@@ -138,4 +138,22 @@ export const templates = [
       return plan
     },
   },
+  {
+    id: 'homemaker',
+    name: '片働き・専業主婦世帯',
+    build: () => {
+      const plan = clonePlan(defaultPlan)
+      plan.assumptions.initialAssets = 10_000_000
+      plan.adults[0].currentAge = 35
+      plan.adults[1].currentAge = 35
+      plan.adults[0].annualSalary = 8_000_000
+      plan.adults[1].annualSalary = 0 // Homemaker spouse
+      plan.adults[1].annualPension = 780_000 // Basic national pension
+      plan.children = [
+        { id: 'child-1', name: '子ども1', currentAge: 6 },
+        { id: 'child-2', name: '子ども2', currentAge: 2 },
+      ]
+      return plan
+    },
+  },
 ] as const

@@ -18,12 +18,14 @@ describe('single-page planner interactions', () => {
     expect(screen.getByDisplayValue('新しいイベント')).toBeInTheDocument()
   })
 
-  it('opens the tools drawer and creates an isolated scenario B', async () => {
+  it('opens the chat assistant and applies a quick template', async () => {
     const user = userEvent.setup()
     render(<App />)
-    await user.click(screen.getByRole('button', { name: 'ツール・比較' }))
-    await user.click(screen.getByRole('button', { name: '現在のプランをBへコピー' }))
-    expect(screen.getByText('B · 最終残高')).toBeInTheDocument()
+    const fab = screen.getByTitle('AI Assistant')
+    await user.click(fab)
+    expect(screen.getByText('AIアシスタント')).toBeInTheDocument()
+    await user.click(screen.getByText('単身・堅実型'))
+    expect(screen.getByText('「単身・堅実型」のテンプレートを適用しました。データが更新されました。')).toBeInTheDocument()
   })
 
   it('starts with the simplified inputs and shows cash flow before assets', async () => {

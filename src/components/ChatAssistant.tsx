@@ -2,6 +2,7 @@ import { MessageSquare, Send, Trash2, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { type ChatMessage, sendMessage } from '../services/groqService'
 import type { I18nCopy, Locale } from '../i18n'
+import { templates } from '../data/defaultPlan'
 import type { PlannerV2 } from '../types'
 
 type Props = {
@@ -24,6 +25,49 @@ export function ChatAssistant({ plan, locale, copy, onChange }: Props) {
   const [loading, setLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  const getTemplateDisplayName = (id: string, defaultName: string) => {
+    if (locale === 'zh') {
+      if (id === 'standard') return '普通工薪家庭'
+      if (id === 'family') return '双职工家庭'
+      if (id === 'single') return '单身稳健家庭'
+      if (id === 'homemaker') return '家庭主妇家庭'
+    } else if (locale === 'en') {
+      if (id === 'standard') return 'Standard Family'
+      if (id === 'family') return 'Dual-Income Family'
+      if (id === 'single') return 'Single Household'
+      if (id === 'homemaker') return 'Homemaker Family'
+    }
+    return defaultName
+  }
+
+  const handleApplyTemplate = (templateId: string) => {
+    const template = templates.find((t) => t.id === templateId)
+    if (!template) return
+
+    const nextPlan = template.build()
+    onChange(nextPlan)
+
+    const userText =
+      locale === 'zh'
+        ? `加载模板：${getTemplateDisplayName(template.id, template.name)}`
+        : locale === 'ja'
+          ? `テンプレートを適用：${template.name}`
+          : `Apply template: ${getTemplateDisplayName(template.id, template.name)}`
+
+    const assistantText =
+      locale === 'zh'
+        ? `已为您加载「${getTemplateDisplayName(template.id, template.name)}」的规划模板，数据已在主界面中更新。`
+        : locale === 'ja'
+          ? `「${template.name}」のテンプレートを適用しました。データが更新されました。`
+          : `Successfully loaded the "${getTemplateDisplayName(template.id, template.name)}" template. The plan parameters have been updated.`
+
+    setHistory((prev) => [
+      ...prev,
+      { id: `user-${Date.now()}`, role: 'user' as const, text: userText },
+      { id: `ai-${Date.now()}`, role: 'assistant' as const, text: assistantText },
+    ])
+  }
+
   // Initialize greeting on mount or locale change
   useEffect(() => {
     const greetingText =
@@ -44,8 +88,8 @@ export function ChatAssistant({ plan, locale, copy, onChange }: Props) {
 
   // Scroll to bottom when history updates
   useEffect(() => {
-    if (open) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (open && typeof messagesEndRef.current?.scrollIntoView === 'function') {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [history, open])
 
@@ -312,17 +356,39 @@ Strictly output valid JSON matching the format. Be precise about numbers, curren
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="ai-chips-container">
-          {chips.map((chip, i) => (
-            <button
-              key={i}
-              type="button"
-              className="ai-chip"
-              onClick={() => handleSend(chip)}
-            >
-              {chip}
-            </button>
-          ))}
+        <div className="ai-chips-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', padding: '0.65rem 1rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.38rem' }}>
+            <span style={{ fontSize: '0.52rem', color: 'var(--muted)', width: '100%', fontWeight: 700, marginBottom: '0.1rem' }}>
+              {locale === 'zh' ? '⚡ 快速模板 (不消耗AI额度)' : locale === 'ja' ? '⚡ クイックテンプレート (AI不要)' : '⚡ Quick Templates (No AI needed)'}
+            </span>
+            {templates.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                className="ai-chip"
+                style={{ borderColor: 'var(--blue-600)', background: 'var(--blue-50)', color: 'var(--blue-700)', fontWeight: 650 }}
+                onClick={() => handleApplyTemplate(t.id)}
+              >
+                {getTemplateDisplayName(t.id, t.name)}
+              </button>
+            ))}
+          </div>
+          
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.38rem', marginTop: '0.2rem' }}>
+            <span style={{ fontSize: '0.52rem', color: 'var(--muted)', width: '100%', fontWeight: 700, marginBottom: '0.1rem' }}>
+              {locale === 'zh' ? '🤖 AI 提问示例' : locale === 'ja' ? '🤖 AI質問の例' : '🤖 AI Prompts'}
+            </span>
+            {chips.map((chip, i) => (
+              <button
+                key={i}
+                type="button"
+                className="ai-chip"
+                onClick={() => handleSend(chip)}
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
         </div>
 
         <form
