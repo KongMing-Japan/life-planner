@@ -224,10 +224,10 @@ Strictly output valid JSON matching the format. Be precise about numbers, curren
       console.error('AI error:', error)
       const errorText =
         locale === 'zh'
-          ? '抱歉，解析请求时出现错误。请重试。'
+          ? '当前AI服务繁忙，请稍后重新发送。'
           : locale === 'ja'
-            ? 'すみません、処理中にエラーが発生しました。もう一度入力してください。'
-            : 'Sorry, an error occurred while processing your request. Please try again.'
+            ? '現在AIサービスが混雑しています。しばらく経ってから再度送信してください。'
+            : 'The AI service is currently busy. Please try again later.'
       setHistory((prev) => [
         ...prev,
         { id: `error-${Date.now()}`, role: 'assistant', text: errorText },
