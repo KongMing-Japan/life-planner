@@ -56,7 +56,7 @@ describe('planner storage', () => {
     const previous = clonePlan(defaultPlan)
     previous.adults[0].currentAge = 45
     previous.adults[1].currentAge = 40
-    previous.children = [{ id: 'child-1', name: '孩子 1', currentAge: 7 }]
+    previous.children = [{ id: 'child-1', name: '子ども1', currentAge: 7 }]
     previous.events = [
       { id: 'school-primary', name: '国际学校学费', memberId: 'child-1', type: 'expense', startYear: 2026, duration: 6, annualAmount: 5_000_000, taxable: false },
       { id: 'home-purchase', name: '购置住房', memberId: null, type: 'expense', startYear: 2036, duration: 1, annualAmount: 40_000_000, taxable: false },

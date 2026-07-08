@@ -132,8 +132,8 @@ export const templates = [
       plan.adults[0].annualSalary = 8_000_000
       plan.adults[1].annualSalary = 6_000_000
       plan.children = [
-        { id: 'child-1', name: '孩子 1', currentAge: 8 },
-        { id: 'child-2', name: '孩子 2', currentAge: 4 },
+        { id: 'child-1', name: '子ども1', currentAge: 8 },
+        { id: 'child-2', name: '子ども2', currentAge: 4 },
       ]
       return plan
     },

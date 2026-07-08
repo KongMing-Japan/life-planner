@@ -29,10 +29,25 @@ export type I18nCopy = { [K in keyof typeof translations.ja]: string }
 export const getCopy = (locale: Locale): I18nCopy => translations[locale] as I18nCopy
 
 export const formatMoney = (value: number, locale: Locale) => {
-  const amount = Math.round(value / 10_000)
+  const isNegative = value < 0
+  const absVal = Math.abs(value)
+  const amount = Math.round(absVal / 10_000)
   const numberLocale = locale === 'ja' ? 'ja-JP' : 'zh-CN'
-  const unit = locale === 'ja' ? '万円' : '万日元'
-  return `${amount.toLocaleString(numberLocale)}${unit}`
+
+  let formatted = ''
+  if (amount >= 10_000) {
+    const oku = Math.floor(amount / 10_000)
+    const man = amount % 10_000
+    if (locale === 'ja') {
+      formatted = man === 0 ? `${oku}億円` : `${oku}億${man.toLocaleString(numberLocale)}万円`
+    } else {
+      formatted = man === 0 ? `${oku}亿日元` : `${oku}亿${man.toLocaleString(numberLocale)}万日元`
+    }
+  } else {
+    const unit = locale === 'ja' ? '万円' : '万日元'
+    formatted = `${amount.toLocaleString(numberLocale)}${unit}`
+  }
+  return isNegative ? `-${formatted}` : formatted
 }
 
 export const formatPercent = (value: number) => `${(value * 100).toFixed(1)}%`

@@ -105,7 +105,7 @@ export function migrateLegacyPlan(input: unknown): PlannerV2 | null {
     },
     adults,
     children: childBirthYear
-      ? [{ id: 'child-1', name: '孩子 1', currentAge: startYear - childBirthYear }]
+      ? [{ id: 'child-1', name: '子ども1', currentAge: startYear - childBirthYear }]
       : [],
     expenses: {
       housingBeforeRetirement: Math.abs(numberValue(setup.Housing_Annual_Pre, 0)),
