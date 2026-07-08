@@ -48,7 +48,7 @@ describe('single-page planner interactions', () => {
   it('switches the complete interface from Japanese to Chinese', async () => {
     const user = userEvent.setup()
     render(<App />)
-    await user.click(screen.getByRole('button', { name: '中' }))
+    await user.click(screen.getByRole('button', { name: /中/ }))
     expect(screen.getByText('人生财富规划器')).toBeInTheDocument()
     expect(screen.getByText('先填6个关键数字')).toBeInTheDocument()
     expect(document.documentElement.lang).toBe('zh-CN')

@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
 
 :root {
-  font-family: 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Noto Sans JP', 'Noto Sans SC', sans-serif;
   color: #0c2344;
   background: #fff;
   font-synthesis: none;
@@ -553,4 +553,41 @@ footer p { margin: 0; }
     border-radius: 0;
   }
 }
+
+/* ========================================
+   Vibe & Typography Enhancements
+   ======================================== */
+.brand-block h1,
+.quick-input-head h2,
+.dashboard-head h1,
+.chart-heading h2,
+.annual-details > summary,
+.ai-panel-header h3,
+.section-heading strong,
+.children-heading strong {
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.kpi-card strong {
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: -0.03em;
+}
+
+.field-control input {
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.quick-grid .field-control input {
+  font-weight: 800;
+}
+
+.language-switch button {
+  min-width: auto;
+  padding: .36rem .55rem;
+}
+
 

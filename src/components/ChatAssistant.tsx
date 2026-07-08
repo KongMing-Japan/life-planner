@@ -186,8 +186,17 @@ You MUST reply with a single JSON object strictly matching this format (no other
 }
 \`\`\`
 
-Here is the user's current planner plan state for reference (merge changes into this, or only supply the modified fields in the "updates" output):
+Here is the user's current planner plan state for reference:
 ${JSON.stringify(plan, null, 2)}
+
+IMPORTANT: ONLY return keys in the "updates" object that are actually changing based on the user's instructions. If a field (such as "events", "children", "adults", or "expenses") is NOT being modified, do NOT include it in the "updates" object. For example, if you are only changing the interest rate, only output:
+{
+  "reply": "...",
+  "updates": {
+    "assumptions": { "nominalReturn": 0.05 }
+  }
+}
+Do NOT output empty arrays or objects (like "events": [] or "children": []) unless the user explicitly requested to delete them, as this will overwrite and delete the user's existing data!
 
 Strictly output valid JSON matching the format. Be precise about numbers, currency, and percentages (e.g. 2% = 0.02). Use ¥10,000 unit values correctly (e.g. 600万 = 6,000,000).`
 
@@ -248,13 +257,16 @@ Strictly output valid JSON matching the format. Be precise about numbers, curren
           }
         }
         if (parsed.updates.children) {
-          nextPlan.children = parsed.updates.children
+          const hasChildrenDeletion = /delete|remove|clear|删除|清除|清空|子どもを削除|削/i.test(messageText)
+          if (parsed.updates.children.length > 0 || hasChildrenDeletion) {
+            nextPlan.children = parsed.updates.children
+          }
         }
         if (parsed.updates.events) {
-          // If the AI returns a list of events, we replace or merge them
-          // Here we just replace the events with the list provided by AI, or merge new ones
-          // To be safe, if events array is supplied, replace it (since LLM has the context of all current events)
-          nextPlan.events = parsed.updates.events
+          const hasEventsDeletion = /delete|remove|clear|删除|清零|清除|清空|削|イベントを削除|クリア/i.test(messageText)
+          if (parsed.updates.events.length > 0 || hasEventsDeletion) {
+            nextPlan.events = parsed.updates.events
+          }
         }
 
         onChange(nextPlan)

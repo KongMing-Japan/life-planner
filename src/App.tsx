@@ -42,7 +42,19 @@ export default function App() {
         </div>
         <div className="header-actions">
           <div className="language-switch" role="group" aria-label={copy.language}>
-            {locales.map((item) => <button className={locale === item.id ? 'active' : ''} type="button" key={item.id} title={item.label} onClick={() => setLocale(item.id)}>{item.short}</button>)}
+            {locales.map((item) => (
+              <button
+                className={locale === item.id ? 'active' : ''}
+                type="button"
+                key={item.id}
+                title={item.label}
+                onClick={() => setLocale(item.id)}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.22rem' }}
+              >
+                <span>{item.id === 'ja' ? '🇯🇵' : item.id === 'zh' ? '🇨🇳' : '🇺🇸'}</span>
+                <span>{item.short}</span>
+              </button>
+            ))}
           </div>
         </div>
       </header>
