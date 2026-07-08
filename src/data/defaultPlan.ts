@@ -50,9 +50,9 @@ export const defaultPlan: PlannerV2 = {
   expenses: {
     housingBeforeRetirement: 0,
     housingAfterRetirement: 0,
-    livingBeforeRetirement: 4_200_000,
-    livingAfterRetirement: 3_000_000,
-    annualTravel: 600_000,
+    livingBeforeRetirement: 4_800_000, // Tokyo family of 4: 40万/month
+    livingAfterRetirement: 3_600_000,  // Tokyo retirement: 30万/month
+    annualTravel: 800_000,            // 80万/year
   },
   events: [
     {
@@ -62,7 +62,7 @@ export const defaultPlan: PlannerV2 = {
       type: 'expense',
       startYear: year,
       duration: 3,
-      annualAmount: 1_440_000,
+      annualAmount: 2_160_000,         // Tokyo family rent: 18万/month
       taxable: false,
     },
     {
@@ -72,7 +72,7 @@ export const defaultPlan: PlannerV2 = {
       type: 'expense',
       startYear: year + 3,
       duration: 1,
-      annualAmount: 6_000_000,
+      annualAmount: 8_000_000,         // Tokyo home purchase down payment: 800万
       taxable: false,
     },
     {
@@ -82,13 +82,13 @@ export const defaultPlan: PlannerV2 = {
       type: 'expense',
       startYear: year + 3,
       duration: 30,
-      annualAmount: 1_800_000,
+      annualAmount: 2_280_000,         // Tokyo mortgage payment: 19万/month
       taxable: false,
     },
-    { id: 'education-child-1', name: '子ども1 教育費', memberId: 'child-1', type: 'expense', startYear: year + 6, duration: 10, annualAmount: 1_000_000, taxable: false },
-    { id: 'education-child-2', name: '子ども2 教育費', memberId: 'child-2', type: 'expense', startYear: year + 10, duration: 10, annualAmount: 1_000_000, taxable: false },
-    { id: 'car-replacement', name: '自動車の買い替え', memberId: null, type: 'expense', startYear: year + 8, duration: 1, annualAmount: 3_000_000, taxable: false },
-    { id: 'home-renovation', name: '住宅リフォーム', memberId: null, type: 'expense', startYear: year + 23, duration: 1, annualAmount: 4_000_000, taxable: false },
+    { id: 'education-child-1', name: '子ども1 教育費', memberId: 'child-1', type: 'expense', startYear: year + 6, duration: 10, annualAmount: 1_200_000, taxable: false }, // Tokyo school + cram school: 120万/year
+    { id: 'education-child-2', name: '子ども2 教育費', memberId: 'child-2', type: 'expense', startYear: year + 10, duration: 10, annualAmount: 1_200_000, taxable: false },
+    { id: 'car-replacement', name: '自動車の買い替え', memberId: null, type: 'expense', startYear: year + 8, duration: 1, annualAmount: 3_500_000, taxable: false },     // Family minivan: 350万
+    { id: 'home-renovation', name: '住宅リフォーム', memberId: null, type: 'expense', startYear: year + 23, duration: 1, annualAmount: 5_000_000, taxable: false },        // Refurbishment: 500万
   ],
 }
 
@@ -111,11 +111,11 @@ export const templates = [
       ]
       plan.children = []
       plan.expenses = {
-        housingBeforeRetirement: 1_440_000,
-        housingAfterRetirement: 1_200_000,
-        livingBeforeRetirement: 2_400_000,
-        livingAfterRetirement: 2_100_000,
-        annualTravel: 500_000,
+        housingBeforeRetirement: 1_680_000, // Tokyo single rent: 14万/month
+        housingAfterRetirement: 1_200_000,  // Retirement housing: 10万/month
+        livingBeforeRetirement: 2_640_000,  // Single living: 22万/month
+        livingAfterRetirement: 2_280_000,   // Retirement living: 19万/month
+        annualTravel: 600_000,             // Travel: 60万/year
       }
       plan.events = []
       return plan

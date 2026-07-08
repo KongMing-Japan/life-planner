@@ -148,7 +148,7 @@ describe('planner engine', () => {
     plan.assumptions.nominalReturn = 0.05
     plan.events = []
     const row = generateProjection(plan)[0]
-    expect(row.endAssets).toBeCloseTo(19_741_176.47, 2)
+    expect(row.endAssets).toBeCloseTo(18_941_176.47, 2)
   })
 
   it('reconciles the standard four-person household at major life stages', () => {
@@ -156,23 +156,23 @@ describe('planner engine', () => {
     const age35 = rows.find((row) => row.primaryAge === 35)!
     expect(age35.salaryIncome).toBe(13_000_000)
     expect(age35.tax).toBe(3_900_000)
-    expect(age35.baseExpense).toBe(4_800_000)
-    expect(age35.eventExpense).toBe(1_440_000)
-    expect(age35.endAssets).toBeCloseTo(18_154_117.65, 2)
+    expect(age35.baseExpense).toBe(5_600_000)
+    expect(age35.eventExpense).toBe(2_160_000)
+    expect(age35.endAssets).toBeCloseTo(16_634_117.65, 2)
 
     const age38 = rows.find((row) => row.primaryAge === 38)!
-    expect(age38.eventExpense).toBe(7_800_000)
+    expect(age38.eventExpense).toBe(10_280_000)
     expect(age38.eventNames).toEqual(expect.arrayContaining(['住宅購入・頭金', '住宅ローン返済']))
 
     const age65 = rows.find((row) => row.primaryAge === 65)!
     expect(age65.salaryIncome).toBe(0)
     expect(age65.pensionIncome).toBe(3_200_000)
-    expect(age65.baseExpense).toBe(3_600_000)
-    expect(age65.eventExpense).toBe(1_800_000)
+    expect(age65.baseExpense).toBe(4_400_000)
+    expect(age65.eventExpense).toBe(2_280_000)
 
     const age70 = rows.find((row) => row.primaryAge === 70)!
     expect(age70.eventExpense).toBe(0)
     expect(age70.medicalExpense).toBe(1_600_000)
-    expect(age70.totalExpense).toBe(5_200_000)
+    expect(age70.totalExpense).toBe(6_000_000)
   })
 })
