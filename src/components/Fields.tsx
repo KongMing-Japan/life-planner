@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes, ReactNode } from 'react'
+import { type InputHTMLAttributes, type ReactNode, useEffect, useState } from 'react'
 
 type NumberFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'type'> & {
   label: string
@@ -10,6 +10,26 @@ type NumberFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'o
 }
 
 export function NumberField({ label, value, onChange, suffix, hint, scale = 1, min, max, step, ...props }: NumberFieldProps) {
+  const scaledValue = Number.isFinite(value) ? value / scale : 0
+  const [inputValue, setInputValue] = useState<string>(scaledValue.toString())
+
+  useEffect(() => {
+    const nextValStr = scaledValue.toString()
+    if (Number(inputValue) !== scaledValue || (inputValue === '' && scaledValue !== 0)) {
+      setInputValue(nextValStr)
+    }
+  }, [value, scale])
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const valStr = event.target.value
+    setInputValue(valStr)
+
+    const numVal = valStr === '' ? 0 : Number(valStr)
+    if (!isNaN(numVal)) {
+      onChange(numVal * scale)
+    }
+  }
+
   return (
     <label className="field">
       <span className="field-label">{label}</span>
@@ -20,8 +40,8 @@ export function NumberField({ label, value, onChange, suffix, hint, scale = 1, m
           min={typeof min === 'number' ? min / scale : min}
           max={typeof max === 'number' ? max / scale : max}
           step={typeof step === 'number' ? step / scale : step}
-          value={Number.isFinite(value) ? value / scale : 0}
-          onChange={(event) => onChange((Number(event.target.value) || 0) * scale)}
+          value={inputValue}
+          onChange={handleInputChange}
         />
         {suffix ? <em>{suffix}</em> : null}
       </span>

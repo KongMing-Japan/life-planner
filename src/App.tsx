@@ -12,7 +12,7 @@ export default function App() {
   const [plan, setPlan] = useState<PlannerV2>(() => loadPlan())
   const [locale, setLocale] = useState<Locale>(() => {
     const saved = localStorage.getItem('life-planner-language')
-    return saved === 'zh' || saved === 'en' ? saved : 'ja'
+    return saved === 'zh' ? saved : 'ja'
   })
   const deferredPlan = useDeferredValue(plan)
   const output = useMemo(() => buildPlanOutput(deferredPlan), [deferredPlan])
@@ -49,9 +49,19 @@ export default function App() {
                 key={item.id}
                 title={item.label}
                 onClick={() => setLocale(item.id)}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.22rem' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
               >
-                <span>{item.id === 'ja' ? '🇯🇵' : item.id === 'zh' ? '🇨🇳' : '🇺🇸'}</span>
+                {item.id === 'ja' ? (
+                  <svg viewBox="0 0 24 24" width="14" height="14" style={{ borderRadius: '50%', boxShadow: '0 1px 2px rgba(0,0,0,0.12)', border: '1px solid #e2e8f0', flexShrink: 0 }}>
+                    <rect width="24" height="24" fill="#ffffff" />
+                    <circle cx="12" cy="12" r="5.5" fill="#bc002d" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" width="14" height="14" style={{ borderRadius: '50%', boxShadow: '0 1px 2px rgba(0,0,0,0.12)', flexShrink: 0 }}>
+                    <rect width="24" height="24" fill="#de2910" />
+                    <polygon points="12,5 14,11 20,11 15,15 17,21 12,17 7,21 9,15 4,11 10,11" fill="#ffde00" style={{ transform: 'scale(0.85)', transformOrigin: '12px 12px' }} />
+                  </svg>
+                )}
                 <span>{item.short}</span>
               </button>
             ))}

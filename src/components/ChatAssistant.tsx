@@ -31,11 +31,6 @@ export function ChatAssistant({ plan, locale, copy, onChange }: Props) {
       if (id === 'family') return '双职工家庭'
       if (id === 'single') return '单身稳健家庭'
       if (id === 'homemaker') return '家庭主妇家庭'
-    } else if (locale === 'en') {
-      if (id === 'standard') return 'Standard Family'
-      if (id === 'family') return 'Dual-Income Family'
-      if (id === 'single') return 'Single Household'
-      if (id === 'homemaker') return 'Homemaker Family'
     }
     return defaultName
   }
@@ -50,16 +45,12 @@ export function ChatAssistant({ plan, locale, copy, onChange }: Props) {
     const userText =
       locale === 'zh'
         ? `加载模板：${getTemplateDisplayName(template.id, template.name)}`
-        : locale === 'ja'
-          ? `テンプレートを適用：${template.name}`
-          : `Apply template: ${getTemplateDisplayName(template.id, template.name)}`
+        : `テンプレートを適用：${template.name}`
 
     const assistantText =
       locale === 'zh'
         ? `已为您加载「${getTemplateDisplayName(template.id, template.name)}」的规划模板，数据已在主界面中更新。`
-        : locale === 'ja'
-          ? `「${template.name}」のテンプレートを適用しました。データが更新されました。`
-          : `Successfully loaded the "${getTemplateDisplayName(template.id, template.name)}" template. The plan parameters have been updated.`
+        : `「${template.name}」のテンプレートを適用しました。データが更新されました。`
 
     setHistory((prev) => [
       ...prev,
@@ -73,9 +64,7 @@ export function ChatAssistant({ plan, locale, copy, onChange }: Props) {
     const greetingText =
       locale === 'zh'
         ? '您好！我是您的 AI 财务助手。您可以直接输入您的基本情况（例如：“我35岁，年收600万，打算65岁退休”）或让我调整参数（例如：“把通胀率改为 2%”、“添加每年100万的教育费，持续10年”）。'
-        : locale === 'ja'
-          ? 'こんにちは！AIアシスタントです。あなたの状況（例：「私は35歳、年収600万、65歳退職予定」）を教えていただくか、「物価上昇率を2%に変更」「教育費として毎年100万円を10年間追加」などの調整を指示してください。'
-          : 'Hello! I am your AI Assistant. Tell me about your household (e.g., "I\'m 35 years old earning 6M, plan to retire at 65") or ask me to make changes (e.g., "Set inflation to 2%", "Add annual tuition of 1M for 10 years").'
+        : 'こんにちは！AIアシスタントです。あなたの状況（例：「私は35歳、年収600万、65歳退職予定」）を教えていただくか、「物価上昇率を2%に変更」「教育費として毎年100万円を10年間追加」などの調整を指示してください。'
 
     setHistory([
       {
@@ -97,9 +86,7 @@ export function ChatAssistant({ plan, locale, copy, onChange }: Props) {
     const greetingText =
       locale === 'zh'
         ? '已清空对话记录。请告诉我您想做哪些调整。'
-        : locale === 'ja'
-          ? '対話履歴をクリアしました。どのような調整を行いますか？'
-          : 'Conversation cleared. What changes would you like to make?'
+        : '対話履歴をクリアしました。どのような調整を行いますか？'
 
     setHistory([
       {
@@ -301,19 +288,12 @@ Strictly output valid JSON matching the format. Be precise about numbers, curren
           '从2032年开始，连续4年每年新增200万大学学费支出',
           '设置计划至95岁，通胀率1.8%',
         ]
-      : locale === 'ja'
-        ? [
-            '私は35歳年収600万、配偶者は32歳年収400万',
-            '運用利回りを4.5%に変更',
-            '2032年から4年間、毎年200万円の大学学費を追加',
-            '95歳まで試算、インフレ率1.8%',
-          ]
-        : [
-            'I am 35 with 6M income, spouse is 32 with 4M',
-            'Set return rate to 4.5%',
-            'Add 2M annual tuition for 4 years starting in 2032',
-            'Plan through 95 with 1.8% inflation',
-          ]
+      : [
+          '私は35歳年収600万、配偶者は32歳年収400万',
+          '運用利回りを4.5%に変更',
+          '2032年から4年間、毎年200万円の大学学费を追加',
+          '95歳まで試算、インフレ率1.8%',
+        ]
 
   return (
     <>
@@ -331,7 +311,7 @@ Strictly output valid JSON matching the format. Be precise about numbers, curren
         <div className="ai-panel-header">
           <h3>
             <MessageSquare />
-            {locale === 'zh' ? 'AI 财务助手' : locale === 'ja' ? 'AIアシスタント' : 'AI Assistant'}
+            {locale === 'zh' ? 'AI 财务助手' : 'AIアシスタント'}
           </h3>
           <div className="ai-panel-header-actions">
             <button
