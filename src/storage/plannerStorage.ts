@@ -14,17 +14,86 @@ const numberValue = (value: unknown, fallback: number) => {
   return Number.isFinite(result) ? result : fallback
 }
 
-const normalizeV2Plan = (plan: PlannerV2): PlannerV2 => ({
-  ...plan,
-  assumptions: {
-    ...plan.assumptions,
-    borrowingRate: numberValue(plan.assumptions.borrowingRate, 0.06),
-  },
-  adults: plan.adults.map((adult) => ({
-    ...adult,
-    annualSalaryGrowth: numberValue(adult.annualSalaryGrowth, 0),
-  })),
-})
+const boundedNumber = (value: unknown, fallback: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, numberValue(value, fallback)))
+
+const normalizeV2Plan = (plan: UnknownRecord): PlannerV2 => {
+  const assumptions = record(plan.assumptions) ?? {}
+  const expenses = record(plan.expenses) ?? {}
+  const adults = Array.isArray(plan.adults) ? plan.adults.slice(0, 4) : []
+  const children = Array.isArray(plan.children) ? plan.children.slice(0, 30) : []
+  const events = Array.isArray(plan.events) ? plan.events.slice(0, 500) : []
+
+  const normalizedAdults = adults
+    .map((value, index) => {
+      const adult = record(value)
+      if (!adult) return null
+      const role = adult.role === 'spouse' ? 'spouse' : 'primary'
+      const fallback = defaultPlan.adults.find((item) => item.role === role) ?? defaultPlan.adults[index] ?? defaultPlan.adults[0]
+      return {
+        ...fallback,
+        ...adult,
+        id: String(adult.id || fallback.id),
+        role,
+        name: String(adult.name || fallback.name),
+        currentAge: boundedNumber(adult.currentAge, fallback.currentAge, 0, 120),
+        annualSalary: numberValue(adult.annualSalary, fallback.annualSalary),
+        annualSalaryGrowth: numberValue(adult.annualSalaryGrowth, 0),
+        retireAge: boundedNumber(adult.retireAge, fallback.retireAge, 18, 120),
+        pensionStartAge: boundedNumber(adult.pensionStartAge, fallback.pensionStartAge, 0, 120),
+        annualPension: numberValue(adult.annualPension, fallback.annualPension),
+        medicalStartAge: boundedNumber(adult.medicalStartAge, fallback.medicalStartAge, 0, 120),
+        annualMedicalExpense: numberValue(adult.annualMedicalExpense, fallback.annualMedicalExpense),
+      } as Adult
+    })
+    .filter((adult): adult is Adult => Boolean(adult))
+
+  return {
+    version: 2,
+    assumptions: {
+      startYear: boundedNumber(assumptions.startYear, defaultPlan.assumptions.startYear, 1900, 2200),
+      endAge: boundedNumber(assumptions.endAge, defaultPlan.assumptions.endAge, 18, 120),
+      initialAssets: numberValue(assumptions.initialAssets, defaultPlan.assumptions.initialAssets),
+      nominalReturn: numberValue(assumptions.nominalReturn, defaultPlan.assumptions.nominalReturn),
+      inflation: numberValue(assumptions.inflation, defaultPlan.assumptions.inflation),
+      salaryTaxRate: numberValue(assumptions.salaryTaxRate, defaultPlan.assumptions.salaryTaxRate),
+      pensionTaxRate: numberValue(assumptions.pensionTaxRate, defaultPlan.assumptions.pensionTaxRate),
+      eventTaxRate: numberValue(assumptions.eventTaxRate, defaultPlan.assumptions.eventTaxRate),
+      borrowingRate: numberValue(assumptions.borrowingRate, defaultPlan.assumptions.borrowingRate),
+    },
+    adults: normalizedAdults.length ? normalizedAdults : clonePlan(defaultPlan).adults,
+    children: children.flatMap((value, index) => {
+      const child = record(value)
+      if (!child) return []
+      return [{
+        id: String(child.id || `child-${index + 1}`),
+        name: String(child.name || `子ども${index + 1}`),
+        currentAge: boundedNumber(child.currentAge, 0, 0, 120),
+      }]
+    }),
+    expenses: {
+      housingBeforeRetirement: numberValue(expenses.housingBeforeRetirement, defaultPlan.expenses.housingBeforeRetirement),
+      housingAfterRetirement: numberValue(expenses.housingAfterRetirement, defaultPlan.expenses.housingAfterRetirement),
+      livingBeforeRetirement: numberValue(expenses.livingBeforeRetirement, defaultPlan.expenses.livingBeforeRetirement),
+      livingAfterRetirement: numberValue(expenses.livingAfterRetirement, defaultPlan.expenses.livingAfterRetirement),
+      annualTravel: numberValue(expenses.annualTravel, defaultPlan.expenses.annualTravel),
+    },
+    events: events.flatMap((value, index) => {
+      const event = record(value)
+      if (!event) return []
+      return [{
+        id: String(event.id || `event-${index + 1}`),
+        name: String(event.name || `イベント${index + 1}`),
+        memberId: typeof event.memberId === 'string' ? event.memberId : null,
+        type: event.type === 'income' ? 'income' : 'expense',
+        startYear: boundedNumber(event.startYear, defaultPlan.assumptions.startYear, 1900, 2300),
+        duration: boundedNumber(event.duration, 1, 1, 120),
+        annualAmount: Math.abs(numberValue(event.annualAmount, 0)),
+        taxable: Boolean(event.taxable),
+      } as LifeEvent]
+    }),
+  }
+}
 
 const isPreviousBuiltInExample = (plan: PlannerV2) =>
   plan.adults[0]?.currentAge === 45 &&
@@ -52,7 +121,7 @@ export function migrateLegacyPlan(input: unknown): PlannerV2 | null {
   const root = record(input)
   if (!root) return null
   const payload = record(root.plan) ?? record(root.currentPlan) ?? root
-  if (payload.version === 2 && Array.isArray(payload.adults)) return normalizeV2Plan(payload as unknown as PlannerV2)
+  if (payload.version === 2 && Array.isArray(payload.adults)) return normalizeV2Plan(payload)
   const setup = record(payload.setup)
   const events = Array.isArray(payload.events) ? payload.events : null
   if (!setup || !events) return null

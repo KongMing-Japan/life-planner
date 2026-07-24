@@ -1,15 +1,47 @@
-import { PanelRightOpen, ShieldCheck } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 import { useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { Dashboard } from './components/Dashboard'
 import { InputPanel } from './components/InputPanel'
 import { ChatAssistant } from './components/ChatAssistant'
+import { LifeOsNav } from './components/LifeOsNav'
+import { LifeOsNextSteps } from './components/LifeOsNextSteps'
 import { buildPlanOutput } from './engine/planner'
 import { getCopy, locales, type Locale } from './i18n'
 import { loadPlan, savePlan } from './storage/plannerStorage'
 import type { PlannerV2 } from './types'
 
+const readHandoffPlan = (): PlannerV2 => {
+  const saved = loadPlan()
+  const params = new URLSearchParams(window.location.search)
+  const source = params.get('source')
+  if (source !== 'tax' && source !== 'portfolio') return saved
+
+  const readPositive = (key: string, allowZero = false) => {
+    if (!params.has(key)) return null
+    const value = Number(params.get(key))
+    return Number.isFinite(value) && (allowZero ? value >= 0 : value > 0) ? value : null
+  }
+  const income = readPositive('income', true)
+  const age = readPositive('age')
+  const assets = readPositive('assets', true)
+
+  return {
+    ...saved,
+    assumptions: assets === null
+      ? saved.assumptions
+      : { ...saved.assumptions, initialAssets: assets },
+    adults: saved.adults.map((adult, index) => index === 0
+      ? {
+          ...adult,
+          annualSalary: income ?? adult.annualSalary,
+          currentAge: age === null ? adult.currentAge : Math.round(age),
+        }
+      : adult),
+  }
+}
+
 export default function App() {
-  const [plan, setPlan] = useState<PlannerV2>(() => loadPlan())
+  const [plan, setPlan] = useState<PlannerV2>(readHandoffPlan)
   const [locale, setLocale] = useState<Locale>(() => {
     const saved = localStorage.getItem('life-planner-language')
     return saved === 'zh' ? saved : 'ja'
@@ -19,7 +51,10 @@ export default function App() {
   const copy = getCopy(locale)
 
   useEffect(() => {
-    if (window.location.pathname !== '/') window.history.replaceState(null, '', '/')
+    const source = new URLSearchParams(window.location.search).get('source')
+    if (window.location.pathname !== '/' || source === 'tax' || source === 'portfolio') {
+      window.history.replaceState(null, '', '/')
+    }
   }, [])
 
   useEffect(() => {
@@ -30,11 +65,12 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('life-planner-language', locale)
     document.documentElement.lang = locale === 'zh' ? 'zh-CN' : locale
-    document.title = `${copy.appTitle} | Life Planner`
+    document.title = `${copy.appTitle} | Kong Ming`
   }, [copy.appTitle, locale])
 
   return (
     <div className="app-shell">
+      <LifeOsNav locale={locale} />
       <header className="app-header">
         <div className="brand-block">
           <span className="brand-mark"><ShieldCheck /></span>
@@ -72,7 +108,9 @@ export default function App() {
         <Dashboard output={output} locale={locale} copy={copy} />
       </main>
 
-      <footer><p>{copy.disclaimer}</p><span>Life Planner v2 · {copy.localSave}</span></footer>
+      <LifeOsNextSteps locale={locale} plan={plan} />
+
+      <footer><p>{copy.disclaimer}</p><span>LifeOS Planner · {copy.localSave}</span></footer>
       <ChatAssistant plan={plan} locale={locale} copy={copy} onChange={setPlan} />
     </div>
   )

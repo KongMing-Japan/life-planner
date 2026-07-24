@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
 import App from './App'
@@ -28,17 +28,19 @@ describe('single-page planner interactions', () => {
     expect(screen.getByText('「単身・堅実型」のテンプレートを適用しました。データが更新されました。')).toBeInTheDocument()
   })
 
-  it('starts with the simplified inputs and shows cash flow before assets', async () => {
+  it('starts with the simplified inputs and shows the interactive financial story', async () => {
     const user = userEvent.setup()
     render(<App />)
     expect(screen.getByText('まず6つの数字を入力')).toBeInTheDocument()
     expect(screen.queryByText('REAL YEN · 現在価値')).not.toBeInTheDocument()
     expect(screen.getByText('必要な運用利回り')).toBeInTheDocument()
     expect(screen.getByText('退職後の年間調整額')).toBeInTheDocument()
-    expect(screen.getByLabelText('年間収入・支出')).toBeInTheDocument()
-    const cashflow = screen.getByText('年間収入・支出')
-    const assets = screen.getByText('家族資産の推移')
-    expect(cashflow.compareDocumentPosition(assets) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(screen.getByLabelText('家族資産の推移 · 年間収入・支出')).toBeInTheDocument()
+    const ageSlider = screen.getByRole('slider', { name: '選択年齢' })
+    expect(ageSlider).toBeInTheDocument()
+    expect(screen.getByText('年間資産の内訳')).toBeInTheDocument()
+    fireEvent.input(ageSlider, { target: { value: '31' } })
+    expect(within(ageSlider.closest('article')!).getAllByText('66歳').length).toBeGreaterThan(0)
     expect(screen.getAllByText('万円').length).toBeGreaterThan(0)
     await user.click(screen.getByRole('button', { name: '詳細' }))
     expect(screen.getByRole('spinbutton', { name: /本人の年齢/ })).toBeInTheDocument()
@@ -49,7 +51,7 @@ describe('single-page planner interactions', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('button', { name: /中/ }))
-    expect(screen.getByText('人生财富规划器')).toBeInTheDocument()
+    expect(screen.getByText('LifeOS Planner')).toBeInTheDocument()
     expect(screen.getByText('先填6个关键数字')).toBeInTheDocument()
     expect(document.documentElement.lang).toBe('zh-CN')
   })

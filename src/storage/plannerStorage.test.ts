@@ -52,6 +52,37 @@ describe('planner storage', () => {
     expect(importPlan(exportPlan(plan))).toEqual(plan)
   })
 
+  it('repairs incomplete v2 browser data instead of returning a plan that crashes the app', () => {
+    const incomplete = {
+      version: 2,
+      assumptions: { startYear: 2026, initialAssets: 9_000_000 },
+      adults: [{ id: 'primary', role: 'primary', name: '本人', currentAge: 42, annualSalary: 7_000_000 }],
+      children: [],
+    }
+    localStorage.setItem('life-planner-v2', JSON.stringify(incomplete))
+
+    const repaired = loadPlan()
+
+    expect(repaired.assumptions.initialAssets).toBe(9_000_000)
+    expect(repaired.adults[0].currentAge).toBe(42)
+    expect(repaired.expenses).toEqual(defaultPlan.expenses)
+    expect(repaired.events).toEqual([])
+  })
+
+  it('bounds corrupted saved values so projection work stays finite', () => {
+    const corrupted = clonePlan(defaultPlan)
+    corrupted.assumptions.endAge = 1_000_000
+    corrupted.adults[0].currentAge = -1_000_000
+    corrupted.events[0].duration = 1_000_000
+    localStorage.setItem('life-planner-v2', JSON.stringify(corrupted))
+
+    const repaired = loadPlan()
+
+    expect(repaired.assumptions.endAge).toBe(120)
+    expect(repaired.adults[0].currentAge).toBe(0)
+    expect(repaired.events[0].duration).toBe(120)
+  })
+
   it('upgrades the previous untouched example to the new standard family', () => {
     const previous = clonePlan(defaultPlan)
     previous.adults[0].currentAge = 45
