@@ -1,4 +1,3 @@
-import { ShieldCheck } from 'lucide-react'
 import { useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { Dashboard } from './components/Dashboard'
 import { InputPanel } from './components/InputPanel'
@@ -73,7 +72,6 @@ export default function App() {
       <LifeOsNav locale={locale} />
       <header className="app-header">
         <div className="brand-block">
-          <span className="brand-mark"><ShieldCheck /></span>
           <div><h1>{copy.appTitle}</h1><p>{copy.appSubtitle}</p></div>
         </div>
         <div className="header-actions">
@@ -110,7 +108,20 @@ export default function App() {
 
       <LifeOsNextSteps locale={locale} plan={plan} />
 
-      <footer><p>{copy.disclaimer}</p><span>LifeOS Planner · {copy.localSave}</span></footer>
+      <footer>
+        <p>{copy.disclaimer}</p>
+        <div style={{ fontSize: '0.75rem', opacity: 0.7, margin: '0.3rem 0' }}>
+          <span>KongMing Network: </span>
+          <a href="https://kongmingjapan.com/" target="_blank" rel="noreferrer">KongMing</a> ·{' '}
+          <a href="https://radar.kongmingjapan.com/" target="_blank" rel="noreferrer">Radar</a> ·{' '}
+          <a href="https://lab.kongmingjapan.com/" target="_blank" rel="noreferrer">Lab</a> ·{' '}
+          <a href="https://kids.kongmingjapan.com/" target="_blank" rel="noreferrer">Kids</a> ·{' '}
+          <a href="https://tax.kongmingjapan.com/" target="_blank" rel="noreferrer">Tax</a> ·{' '}
+          <a href="https://planner.kongmingjapan.com/">Planner</a> ·{' '}
+          <a href="https://portfolio.kongmingjapan.com/" target="_blank" rel="noreferrer">Portfolio</a>
+        </div>
+        <span>LifeOS Planner · {copy.localSave}</span>
+      </footer>
       <ChatAssistant plan={plan} locale={locale} copy={copy} onChange={setPlan} />
     </div>
   )

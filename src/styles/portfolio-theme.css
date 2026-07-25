@@ -1,0 +1,489 @@
+/* Portfolio-aligned visual system shared across the LifeOS suite. */
+:root {
+  font-family:
+    "Inter Variable", Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Noto Sans SC", "Noto Sans JP", sans-serif;
+  color: #202124;
+  background: #fff;
+  --blue-950: #202124;
+  --blue-900: #3c4043;
+  --blue-700: #1a73e8;
+  --blue-600: #1a73e8;
+  --blue-100: #d2e3fc;
+  --blue-50: #e8f0fe;
+  --ink: #202124;
+  --muted: #5f6368;
+  --rule: #dadce0;
+  --surface: #fff;
+  --canvas: #f8fafd;
+  --teal: #188038;
+  --danger: #c5221f;
+  --danger-bg: #fce8e6;
+  --success: #188038;
+}
+
+body {
+  background: #fff;
+  color: #202124;
+  letter-spacing: -0.006em;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(26, 115, 232, 0.24);
+  outline-offset: 2px;
+}
+
+.app-shell {
+  width: min(1440px, calc(100% - 32px));
+  padding-top: 12px;
+}
+
+.lifeos-nav {
+  min-height: 44px;
+  margin: 0 0 12px;
+  border-color: #d9e1ea;
+  border-radius: 10px;
+  padding: 5px 7px 5px 12px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 24px rgba(7, 21, 41, 0.045);
+}
+
+.lifeos-wordmark {
+  gap: 7px;
+  color: #071529;
+  font-size: 13px;
+  font-weight: 780;
+}
+
+.lifeos-wordmark svg {
+  width: 17px;
+  height: 17px;
+  color: #124f9b;
+}
+
+.lifeos-products {
+  gap: 3px;
+}
+
+.lifeos-products a {
+  min-height: 34px;
+  gap: 6px;
+  border-radius: 7px;
+  padding: 0 10px;
+  color: #68717d;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.lifeos-products a:hover {
+  background: #eaf2fb;
+  color: #124f9b;
+}
+
+.lifeos-products a.is-active {
+  background: #071529;
+  color: #fff;
+}
+
+.lifeos-products svg {
+  width: 14px;
+  height: 14px;
+}
+
+.app-header {
+  min-height: 64px;
+  align-items: center;
+  border-bottom-color: #e8eaed;
+  padding: 0 24px;
+  background: #fff;
+}
+
+.brand-block {
+  gap: 0;
+}
+
+.brand-block h1 {
+  color: #202124;
+  font-size: 20px;
+  font-weight: 620;
+  letter-spacing: -0.025em;
+}
+
+.brand-block p {
+  margin-top: 4px;
+  color: #5f6368;
+  font-size: 13px;
+}
+
+.language-switch {
+  border-color: #dadce0;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.language-switch button:hover {
+  background: #f1f3f4;
+}
+
+.language-switch button.active {
+  background: #e8f0fe;
+  outline-color: #1a73e8;
+  box-shadow: none;
+}
+
+.planner-layout {
+  grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
+  gap: 24px;
+  padding: 28px 0 40px;
+}
+
+.input-panel,
+.dashboard-stack {
+  gap: 20px;
+}
+
+.input-mode-switch {
+  overflow: visible;
+  border: 0;
+  border-bottom: 1px solid #e8eaed;
+  border-radius: 0;
+  padding: 0;
+  background: #fff;
+  box-shadow: none;
+}
+
+.input-mode-switch button {
+  min-height: 44px;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  padding: 0 12px;
+  color: #5f6368;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.input-mode-switch button:hover {
+  background: #f8fafd;
+  color: #1a73e8;
+}
+
+.input-mode-switch button.active {
+  border-bottom-color: #1a73e8;
+  background: transparent;
+  color: #1a73e8;
+  box-shadow: none;
+}
+
+.quick-input-card,
+.input-section,
+.dashboard-head,
+.kpi-card,
+.chart-card,
+.annual-details,
+.lifeos-next-steps,
+.tool-section,
+.fp-advice-card {
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.quick-input-card {
+  padding: 18px 16px;
+}
+
+.quick-input-head span,
+.eyebrow,
+.chart-order,
+.lifeos-next-heading > div:first-child > span {
+  color: #1a73e8;
+  letter-spacing: 0.04em;
+}
+
+.quick-input-head h2,
+.dashboard-head h1,
+.chart-heading h2,
+.lifeos-next-heading h2,
+.fp-advice-head h3 {
+  color: #202124;
+  font-weight: 560;
+  letter-spacing: -0.025em;
+}
+
+.quick-input-head h2 {
+  font-size: 18px;
+}
+
+.quick-input-head > b {
+  background: #e6f4ea;
+  color: #188038;
+}
+
+.quick-grid > label {
+  border-color: #e8eaed;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.field-control input,
+.event-name input,
+.event-meta select,
+.child-row input,
+.member-card-title input {
+  border-color: #dadce0;
+  border-radius: 8px;
+  color: #202124;
+}
+
+.field-control input:focus,
+.event-name input:focus,
+.event-meta select:focus,
+.child-row input:focus,
+.member-card-title input:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.12);
+  outline: none;
+}
+
+.input-section > summary {
+  min-height: 56px;
+  color: #202124;
+  font-size: 16px;
+  font-weight: 560;
+}
+
+.input-section > summary b,
+.annual-details > summary span {
+  background: #e8f0fe;
+  color: #1a73e8;
+}
+
+.assumption-note {
+  border-color: #d2e3fc;
+  border-radius: 8px;
+  background: #f8fafd;
+}
+
+.child-chips > span,
+.child-chips > button {
+  border-color: #dadce0;
+  background: #fff;
+  color: #5f6368;
+}
+
+.add-event-button {
+  border-color: #a8c7fa;
+  border-radius: 8px;
+  background: #f8fafd;
+  color: #1a73e8;
+}
+
+.dashboard-head {
+  padding: 24px;
+}
+
+.dashboard-head h1 {
+  font-size: 28px;
+}
+
+.dashboard-head p {
+  color: #5f6368;
+  font-size: 13px;
+}
+
+.status-pill {
+  border-color: #dadce0;
+  background: #fff;
+  color: #5f6368;
+  font-weight: 500;
+}
+
+.status-pill.success {
+  border-color: #ceead6;
+  background: #e6f4ea;
+  color: #188038;
+}
+
+.status-pill.danger {
+  border-color: #f6aea9;
+  background: #fce8e6;
+  color: #c5221f;
+}
+
+.kpi-grid {
+  gap: 12px;
+}
+
+.kpi-card {
+  padding: 16px;
+}
+
+.kpi-card > span,
+.kpi-card small {
+  color: #5f6368;
+}
+
+.kpi-card > span svg {
+  color: #1a73e8;
+}
+
+.kpi-card strong {
+  color: #202124;
+  font-weight: 560;
+}
+
+.kpi-card.success {
+  border-color: #ceead6;
+  background: #fff;
+}
+
+.kpi-card.danger {
+  border-color: #f6aea9;
+  background: #fff;
+}
+
+.chart-card {
+  padding: 18px 16px 14px;
+}
+
+.chart-card-primary {
+  border-color: #dadce0;
+  box-shadow: none;
+}
+
+.story-stat-grid > div {
+  border-color: #e8eaed;
+  border-radius: 8px;
+  background: #f8fafd;
+}
+
+.story-age-control,
+.story-chart,
+.story-waterfall-head {
+  border-color: #e8eaed;
+}
+
+.annual-details > summary {
+  min-height: 56px;
+  padding: 0 16px;
+  color: #202124;
+  font-size: 14px;
+  font-weight: 560;
+}
+
+th {
+  background: #f8fafd;
+  color: #5f6368;
+  font-weight: 500;
+}
+
+th,
+td {
+  border-bottom-color: #e8eaed;
+}
+
+.lifeos-next-steps {
+  padding: 20px;
+}
+
+.lifeos-next-grid > a {
+  border-color: #dadce0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.lifeos-next-grid > a:hover {
+  border-color: #a8c7fa;
+  box-shadow: 0 4px 14px rgba(60, 64, 67, 0.12);
+  transform: none;
+}
+
+.lifeos-next-grid strong {
+  color: #202124;
+}
+
+.fp-advice-card {
+  margin-top: 0;
+  padding: 18px;
+}
+
+.fp-advice-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e8f0fe;
+  color: #1a73e8;
+}
+
+.fp-advice-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.fp-advice-list {
+  color: #5f6368;
+}
+
+footer {
+  border-top-color: #e8eaed;
+  color: #80868b;
+}
+
+@media (max-width: 1040px) {
+  .planner-layout {
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 18px;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    width: calc(100% - 28px);
+    padding-top: 10px;
+  }
+
+  .lifeos-nav {
+    overflow-x: auto;
+  }
+
+  .app-header {
+    min-height: 96px;
+    align-items: flex-start;
+    padding: 16px 14px;
+  }
+
+  .brand-block h1 {
+    font-size: 18px;
+  }
+
+  .brand-block p {
+    max-width: 240px;
+    font-size: 12px;
+  }
+
+  .planner-layout {
+    gap: 18px;
+    padding-top: 18px;
+  }
+
+  .dashboard-head {
+    padding: 18px 16px;
+  }
+
+  .dashboard-head h1 {
+    font-size: 26px;
+  }
+
+  .input-mode-switch {
+    top: 0;
+    box-shadow: 0 4px 12px rgba(60, 64, 67, 0.12);
+  }
+}

@@ -1,4 +1,4 @@
-import { AlertTriangle, CalendarClock, Landmark, TrendingDown, WalletCards } from 'lucide-react'
+import { AlertTriangle, CalendarClock, Landmark, Lightbulb, TrendingDown, WalletCards } from 'lucide-react'
 import type { I18nCopy, Locale } from '../i18n'
 import { formatMoney, formatPercent, statusLabel } from '../i18n'
 import type { PlanOutput } from '../types'
@@ -31,7 +31,7 @@ export function Dashboard({ output, locale, copy }: Props) {
 
     <article className="fp-advice-card">
       <div className="fp-advice-head">
-        <span className="fp-advice-icon">💡</span>
+        <span className="fp-advice-icon"><Lightbulb aria-hidden="true" /></span>
         <h3>{locale === 'ja' ? 'FPからのライフプラン・アドバイス' : 'FP 理财规划专家建议'}</h3>
       </div>
       <ul className="fp-advice-list">
