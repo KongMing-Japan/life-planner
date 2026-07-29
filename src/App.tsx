@@ -2,10 +2,10 @@ import { useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { Dashboard } from './components/Dashboard'
 import { InputPanel } from './components/InputPanel'
 import { ChatAssistant } from './components/ChatAssistant'
-import { LifeOsNav } from './components/LifeOsNav'
 import { LifeOsNextSteps } from './components/LifeOsNextSteps'
+import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { buildPlanOutput } from './engine/planner'
-import { getCopy, locales, type Locale } from './i18n'
+import { getCopy, type Locale } from './i18n'
 import { loadPlan, savePlan } from './storage/plannerStorage'
 import type { PlannerV2 } from './types'
 
@@ -49,6 +49,26 @@ export default function App() {
   const output = useMemo(() => buildPlanOutput(deferredPlan), [deferredPlan])
   const copy = getCopy(locale)
 
+  const primaryAdult = plan.adults[0]
+  const totalIncome = plan.adults.reduce((acc, adult) => acc + adult.annualSalary, 0)
+  const portfolioParams = useMemo(() => new URLSearchParams({
+    source: 'planner',
+    assets: String(plan.assumptions.initialAssets ?? 0),
+    income: String(totalIncome),
+    age: String(primaryAdult?.currentAge ?? 35),
+  }).toString(), [plan.assumptions.initialAssets, totalIncome, primaryAdult?.currentAge])
+
+  const taxParams = useMemo(() => new URLSearchParams({
+    source: 'planner',
+    income: String(totalIncome),
+    age: String(primaryAdult?.currentAge ?? 35),
+    dependents: String(plan.children.length),
+  }).toString(), [totalIncome, primaryAdult?.currentAge, plan.children.length])
+
+  const portfolioUrl = `https://portfolio.kongmingjapan.com/?${portfolioParams}`
+  const taxLocale = locale === 'zh' ? 'zh-CN' : 'ja'
+  const taxUrl = `https://tax.kongmingjapan.com/${taxLocale}/?${taxParams}`
+
   useEffect(() => {
     const source = new URLSearchParams(window.location.search).get('source')
     if (window.location.pathname !== '/' || source === 'tax' || source === 'portfolio') {
@@ -72,38 +92,30 @@ export default function App() {
       <header className="app-header">
         <div className="brand-block">
           <div>
-            <a className="lifeos-eyebrow" href="https://kongmingjapan.com/" target="_blank" rel="noreferrer">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
-              <span>LifeOS</span>
-            </a>
+            <div className="lifeos-eyebrow-nav">
+              <a className="lifeos-eyebrow-brand" href="https://kongmingjapan.com/" target="_blank" rel="noreferrer">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
+                <span>LifeOS</span>
+              </a>
+              <span className="lifeos-eyebrow-divider">/</span>
+              <nav className="lifeos-eyebrow-menu" aria-label="LifeOS Suite">
+                <a className="lifeos-menu-item active" href="/" aria-current="page">
+                  Planner
+                </a>
+                <a className="lifeos-menu-item" href={portfolioUrl} target="_blank" rel="noreferrer">
+                  Portfolio
+                </a>
+                <a className="lifeos-menu-item" href={taxUrl} target="_blank" rel="noreferrer">
+                  Tax
+                </a>
+              </nav>
+            </div>
             <h1>{copy.appTitle}</h1>
             <p>{copy.appSubtitle}</p>
           </div>
         </div>
         <div className="header-actions">
-          <div className="language-switch" role="group" aria-label={copy.language}>
-            {locales.map((item) => (
-              <button
-                className={locale === item.id ? 'active' : ''}
-                type="button"
-                key={item.id}
-                title={item.label}
-                onClick={() => setLocale(item.id)}
-              >
-                {item.id === 'ja' ? (
-                  <svg viewBox="0 0 24 24" width="16" height="16" style={{ borderRadius: '50%', boxShadow: '0 1px 2px rgba(0,0,0,0.12)', border: '1px solid #e2e8f0', flexShrink: 0 }}>
-                    <rect width="24" height="24" fill="#ffffff" />
-                    <circle cx="12" cy="12" r="5.5" fill="#bc002d" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" width="16" height="16" style={{ borderRadius: '50%', boxShadow: '0 1px 2px rgba(0,0,0,0.12)', flexShrink: 0 }}>
-                    <rect width="24" height="24" fill="#de2910" />
-                    <polygon points="12,5 14,11 20,11 15,15 17,21 12,17 7,21 9,15 4,11 10,11" fill="#ffde00" style={{ transform: 'scale(0.85)', transformOrigin: '12px 12px' }} />
-                  </svg>
-                )}
-              </button>
-            ))}
-          </div>
+          <LanguageSwitcher locale={locale} onLocaleChange={setLocale} />
         </div>
       </header>
 

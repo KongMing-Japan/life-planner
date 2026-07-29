@@ -38,7 +38,8 @@ a:focus-visible {
 }
 
 .app-shell {
-  width: min(1440px, calc(100% - 32px));
+  width: min(100% - 2rem, 1240px);
+  margin: 0 auto;
   padding-top: 12px;
 }
 
@@ -98,7 +99,7 @@ a:focus-visible {
   min-height: 64px;
   align-items: center;
   border-bottom-color: #e8eaed;
-  padding: 0 24px;
+  padding: 0 0 16px;
   background: #fff;
 }
 
@@ -119,21 +120,16 @@ a:focus-visible {
   font-size: 13px;
 }
 
-.language-switch {
+.language-switcher > summary {
   border-color: #dadce0;
-  border-radius: 999px;
   background: #fff;
   box-shadow: none;
 }
 
-.language-switch button:hover {
-  background: #f1f3f4;
-}
-
-.language-switch button.active {
-  background: #e8f0fe;
-  outline-color: #1a73e8;
-  box-shadow: none;
+.language-switcher > summary:hover,
+.language-switcher[open] > summary {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.12);
 }
 
 .planner-layout {
