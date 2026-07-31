@@ -121,7 +121,7 @@ export default function App() {
 
       <main className="planner-layout">
         <InputPanel plan={plan} onChange={setPlan} locale={locale} copy={copy} />
-        <Dashboard output={output} locale={locale} copy={copy} />
+        <Dashboard output={output} locale={locale} copy={copy} plan={plan} onPlanChange={setPlan} />
       </main>
 
       <LifeOsNextSteps locale={locale} plan={plan} />

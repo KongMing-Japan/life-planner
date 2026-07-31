@@ -2,16 +2,24 @@ import { useMemo, useState } from 'react'
 import { AlertTriangle, CalendarClock, Landmark, Lightbulb, TrendingDown, Trophy, WalletCards } from 'lucide-react'
 import type { I18nCopy, Locale } from '../i18n'
 import { formatMoney, formatPercent, statusLabel } from '../i18n'
-import type { PlanOutput } from '../types'
+import type { PlannerV2, PlanOutput } from '../types'
 import { FinancialStoryChart } from './FinancialStoryChart'
 
-type Props = { output: PlanOutput; locale: Locale; copy: I18nCopy }
+type Props = {
+  output: PlanOutput
+  locale: Locale
+  copy: I18nCopy
+  plan?: PlannerV2
+  onPlanChange?: (plan: PlannerV2) => void
+}
 type TableTabKey = 'ledger' | 'events' | 'milestones'
 type WorkspaceNavKey = 'overview' | 'chart' | 'ledger'
 
-export function Dashboard({ output, locale, copy }: Props) {
+export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
   const [activeTableTab, setActiveTableTab] = useState<TableTabKey>('ledger')
   const [workspaceNav, setWorkspaceNav] = useState<WorkspaceNavKey>('overview')
+
+  const primary = plan?.adults.find((adult) => adult.role === 'primary') ?? plan?.adults[0]
 
   const statusClass = output.summary.status === '资金不足' ? 'danger' : output.summary.status === '接近 Die with Zero' ? 'success' : 'primary'
   const requiredReturn = output.summary.requiredNominalReturn
@@ -129,6 +137,82 @@ export function Dashboard({ output, locale, copy }: Props) {
           <strong>{spendingAdjustment === null ? '—' : formatMoney(Math.abs(spendingAdjustment), locale)}</strong>
           <small>{spendingNote}</small>
         </article>
+      </div>
+    )}
+
+    {/* Quicken Real-Time "What-If" Interactive Decision Bar */}
+    {plan && onPlanChange && primary && (workspaceNav === 'overview' || workspaceNav === 'chart') && (
+      <div className="m3-card quicken-what-if-card" style={{ marginBottom: 16 }}>
+        <div className="m3-hero-header">
+          <div>
+            <span className="m3-chip primary">WHAT-IF INTERACTIVE ENGINE</span>
+            <h3 style={{ margin: '4px 0 0', fontSize: 18, fontWeight: 700 }}>{copy.whatIfTitle}</h3>
+          </div>
+        </div>
+        <div className="quicken-slider-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginTop: 12 }}>
+          <div className="quicken-slider-group">
+            <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, color: '#334155' }}>
+              <span>{copy.whatIfRetireAge}</span>
+              <strong style={{ color: '#0284c7' }}>{primary.retireAge} {copy.age}</strong>
+            </label>
+            <input
+              type="range"
+              min={primary.currentAge}
+              max={80}
+              value={primary.retireAge}
+              onChange={(e) => {
+                const newAge = Number(e.target.value)
+                onPlanChange({
+                  ...plan,
+                  adults: plan.adults.map((adult) => adult.id === primary.id ? { ...adult, retireAge: newAge } : adult),
+                })
+              }}
+              style={{ width: '100%', marginTop: 6 }}
+            />
+          </div>
+
+          <div className="quicken-slider-group">
+            <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, color: '#334155' }}>
+              <span>{copy.whatIfNisa}</span>
+              <strong style={{ color: '#16a34a' }}>¥{((plan.assumptions.monthlyNisaContribution ?? 0) / 10000).toFixed(1)}{copy.moneyUnit}/月</strong>
+            </label>
+            <input
+              type="range"
+              min={0}
+              max={300_000}
+              step={10_000}
+              value={plan.assumptions.monthlyNisaContribution ?? 0}
+              onChange={(e) => {
+                onPlanChange({
+                  ...plan,
+                  assumptions: { ...plan.assumptions, monthlyNisaContribution: Number(e.target.value) },
+                })
+              }}
+              style={{ width: '100%', marginTop: 6 }}
+            />
+          </div>
+
+          <div className="quicken-slider-group">
+            <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, color: '#334155' }}>
+              <span>{copy.whatIfRetireSpend}</span>
+              <strong style={{ color: '#dc2626' }}>¥{((plan.expenses.livingAfterRetirement) / 10000).toFixed(0)}{copy.moneyUnit}/年</strong>
+            </label>
+            <input
+              type="range"
+              min={1_000_000}
+              max={15_000_000}
+              step={200_000}
+              value={plan.expenses.livingAfterRetirement}
+              onChange={(e) => {
+                onPlanChange({
+                  ...plan,
+                  expenses: { ...plan.expenses, livingAfterRetirement: Number(e.target.value) },
+                })
+              }}
+              style={{ width: '100%', marginTop: 6 }}
+            />
+          </div>
+        </div>
       </div>
     )}
 
