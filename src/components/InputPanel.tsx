@@ -12,12 +12,8 @@ type InputMode = 'simple' | 'detailed'
 const nextId = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 
 export function InputPanel({ plan, onChange, locale, copy }: Props) {
-  const [mode, setMode] = useState<InputMode>('simple')
   const primary = plan.adults.find((adult) => adult.role === 'primary') ?? plan.adults[0]
   const spouse = plan.adults.find((adult) => adult.role === 'spouse')
-  const totalBefore = plan.expenses.housingBeforeRetirement + plan.expenses.livingBeforeRetirement + plan.expenses.annualTravel
-  const totalAfter = plan.expenses.housingAfterRetirement + plan.expenses.livingAfterRetirement + plan.expenses.annualTravel
-  const endAgeLabel = locale === 'ja' ? `${plan.assumptions.endAge}歳まで` : locale === 'zh' ? `计算至 ${plan.assumptions.endAge}岁` : `through age ${plan.assumptions.endAge}`
 
   const updateAdult = (id: string, patch: Partial<Adult>) => {
     onChange({ ...plan, adults: plan.adults.map((adult) => adult.id === id ? { ...adult, ...patch } : adult) })
@@ -45,17 +41,6 @@ export function InputPanel({ plan, onChange, locale, copy }: Props) {
     onChange({ ...plan, children: plan.children.map((child) => child.id === id ? { ...child, ...patch } : child) })
   }
 
-  const setAnnualExpense = (phase: 'before' | 'after', total: number) => {
-    const travel = Math.min(plan.expenses.annualTravel, Math.max(0, total))
-    const remainder = Math.max(0, total - travel)
-    const housingKey = phase === 'before' ? 'housingBeforeRetirement' : 'housingAfterRetirement'
-    const livingKey = phase === 'before' ? 'livingBeforeRetirement' : 'livingAfterRetirement'
-    const currentHousing = plan.expenses[housingKey]
-    const currentLiving = plan.expenses[livingKey]
-    const housingShare = currentHousing + currentLiving > 0 ? currentHousing / (currentHousing + currentLiving) : 0.3
-    onChange({ ...plan, expenses: { ...plan.expenses, [housingKey]: remainder * housingShare, [livingKey]: remainder * (1 - housingShare) } })
-  }
-
   const updateEvent = (id: string, patch: Partial<LifeEvent>) => {
     onChange({ ...plan, events: plan.events.map((event) => event.id === id ? { ...event, ...patch } : event) })
   }
@@ -68,7 +53,7 @@ export function InputPanel({ plan, onChange, locale, copy }: Props) {
   }
 
   return (
-    <aside className={`input-panel input-mode-${mode}`}>
+    <aside className="input-panel">
       {/* One-Click Preset Personas Bar */}
       <div className="m3-card preset-personas-card" style={{ marginBottom: 12, padding: '12px 14px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
@@ -101,42 +86,14 @@ export function InputPanel({ plan, onChange, locale, copy }: Props) {
         </div>
       </div>
 
-      <div className="input-mode-switch" role="group" aria-label={copy.inputMode}>
-        <button className={mode === 'simple' ? 'active' : ''} type="button" onClick={() => setMode('simple')}><Sparkles />{copy.simple}</button>
-        <button className={mode === 'detailed' ? 'active' : ''} type="button" onClick={() => setMode('detailed')}><Settings2 />{copy.detailed}</button>
-      </div>
-
-      {mode === 'simple' ? (
-        <section className="quick-input-card m3-card">
-          <div className="quick-input-head"><div><span className="m3-chip primary">QUICK START</span><h2>{copy.quickTitle}</h2></div><b>{copy.liveCalc}</b></div>
-          <div className="quick-grid">
-            <NumberField label={copy.assetsNow} value={plan.assumptions.initialAssets} min={0} step={100_000} scale={10_000} suffix={copy.moneyUnit} onChange={(initialAssets) => onChange({ ...plan, assumptions: { ...plan.assumptions, initialAssets } })} />
-            <NumberField label={copy.annualExpense} value={totalBefore} min={0} step={100_000} scale={10_000} suffix={copy.moneyUnit} onChange={(value) => setAnnualExpense('before', value)} />
-            <NumberField label={copy.yourAge} value={primary.currentAge} min={18} max={100} suffix={copy.age} onChange={(currentAge) => updateAdult(primary.id, { currentAge })} />
-            <NumberField label={copy.yourIncome} value={primary.annualSalary} min={0} step={100_000} scale={10_000} suffix={copy.moneyUnit} onChange={(annualSalary) => updateAdult(primary.id, { annualSalary })} />
-            <NumberField label={copy.retireAge} value={primary.retireAge} min={primary.currentAge} max={90} suffix={copy.age} onChange={(retireAge) => updateAdult(primary.id, { retireAge })} />
-            <NumberField label={copy.retirementExpense} value={totalAfter} min={0} step={100_000} scale={10_000} suffix={copy.moneyUnit} onChange={(value) => setAnnualExpense('after', value)} />
+      <div className="m3-card" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        {/* Quicken Step 01: About You & Household */}
+        <section>
+          <SectionHeading icon={<Users />} title={locale === 'ja' ? '01. あなたと家族 (About You)' : '01. 个人与家庭 (About You)'} action={!spouse ? <button className="text-button" type="button" onClick={addSpouse}><UserPlus />{copy.addSpouse}</button> : undefined} />
+          <div className="field-grid two" style={{ marginBottom: 12 }}>
+            <NumberField label={copy.startYear} value={plan.assumptions.startYear} min={2020} max={2100} onChange={(startYear) => onChange({ ...plan, assumptions: { ...plan.assumptions, startYear } })} />
+            <NumberField label={copy.planUntil} value={plan.assumptions.endAge} min={80} max={120} suffix={copy.age} onChange={(endAge) => onChange({ ...plan, assumptions: { ...plan.assumptions, endAge } })} />
           </div>
-
-          <div className="quick-family" style={{ marginTop: 14 }}>
-            <div className="quick-row-title"><strong>{copy.family}</strong>{spouse ? <button type="button" onClick={() => onChange({ ...plan, adults: plan.adults.filter((adult) => adult.id !== spouse.id) })}><Trash2 />{copy.removeSpouse}</button> : <button type="button" onClick={addSpouse}><UserPlus />{copy.addSpouse}</button>}</div>
-            {spouse ? <div className="quick-spouse"><NumberField label={copy.spouseAge} value={spouse.currentAge} min={18} max={100} suffix={copy.age} onChange={(currentAge) => updateAdult(spouse.id, { currentAge })} /><NumberField label={copy.spouseIncome} value={spouse.annualSalary} min={0} step={100_000} scale={10_000} suffix={copy.moneyUnit} onChange={(annualSalary) => updateAdult(spouse.id, { annualSalary })} /></div> : <p>{copy.singleHousehold}</p>}
-            <div className="child-chips">{plan.children.map((child) => <span key={child.id}>{child.name} · {child.currentAge}{copy.age}<button aria-label={`${copy.delete}${child.name}`} type="button" onClick={() => onChange({ ...plan, children: plan.children.filter((item) => item.id !== child.id) })}>×</button></span>)}<button type="button" onClick={addChild}><Plus />{copy.addChild}</button></div>
-          </div>
-
-          <div className="assumption-note" style={{ marginTop: 14 }}>
-            <Settings2 /><div><strong>{copy.standardAssumptions}</strong><p>{copy.nominalReturn} {Math.round(plan.assumptions.nominalReturn * 1000) / 10}% · {copy.inflation} {Math.round(plan.assumptions.inflation * 1000) / 10}% · {endAgeLabel}</p></div><button type="button" onClick={() => setMode('detailed')}>{copy.change}</button>
-          </div>
-        </section>
-      ) : (
-        <div className="m3-card" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {/* Quicken Step 01: About You & Household */}
-          <section>
-            <SectionHeading icon={<Users />} title={locale === 'ja' ? '01. あなたと家族 (About You)' : '01. 个人与家庭 (About You)'} action={!spouse ? <button className="text-button" type="button" onClick={addSpouse}><UserPlus />{copy.addSpouse}</button> : undefined} />
-            <div className="field-grid two" style={{ marginBottom: 12 }}>
-              <NumberField label={copy.startYear} value={plan.assumptions.startYear} min={2020} max={2100} onChange={(startYear) => onChange({ ...plan, assumptions: { ...plan.assumptions, startYear } })} />
-              <NumberField label={copy.planUntil} value={plan.assumptions.endAge} min={80} max={120} suffix={copy.age} onChange={(endAge) => onChange({ ...plan, assumptions: { ...plan.assumptions, endAge } })} />
-            </div>
 
             <div className="member-stack">{plan.adults.map((adult) => <article className="member-card" key={adult.id}>
               <div className="member-card-title"><label><span>{adult.role === 'primary' ? copy.primary : copy.spouse}</span><input aria-label={`${adult.role === 'primary' ? copy.primary : copy.spouse} ${copy.name}`} value={adult.name} onChange={(event) => updateAdult(adult.id, { name: event.target.value })} /></label>{adult.role === 'spouse' ? <button aria-label={`${copy.delete} ${copy.spouse}`} type="button" onClick={() => onChange({ ...plan, adults: plan.adults.filter((item) => item.id !== adult.id) })}><Trash2 /></button> : null}</div>
@@ -206,7 +163,6 @@ export function InputPanel({ plan, onChange, locale, copy }: Props) {
             </div>
           </section>
         </div>
-      )}
 
       {/* Quicken Step 06 & 07: Special Events & Loans */}
       <details className="input-section events-section" open style={{ marginTop: 16 }}>
