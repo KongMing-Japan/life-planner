@@ -134,11 +134,46 @@ export function InputPanel({ plan, onChange, locale, copy }: Props) {
               <NumberField label={copy.livingAfter} value={plan.expenses.livingAfterRetirement} min={0} step={100_000} scale={10_000} suffix={copy.moneyUnit} onChange={(value) => onChange({ ...plan, expenses: { ...plan.expenses, livingAfterRetirement: value } })} />
               <NumberField label={copy.travel} value={plan.expenses.annualTravel} min={0} step={100_000} scale={10_000} suffix={copy.moneyUnit} onChange={(value) => onChange({ ...plan, expenses: { ...plan.expenses, annualTravel: value } })} />
             </div>
-            <details className="advanced-settings"><summary>{copy.taxSettings}</summary><div className="field-grid three compact">
-              <NumberField label={copy.salaryTax} value={plan.assumptions.salaryTaxRate * 100} min={0} max={100} suffix="%" onChange={(value) => onChange({ ...plan, assumptions: { ...plan.assumptions, salaryTaxRate: value / 100 } })} />
-              <NumberField label={copy.pensionTax} value={plan.assumptions.pensionTaxRate * 100} min={0} max={100} suffix="%" onChange={(value) => onChange({ ...plan, assumptions: { ...plan.assumptions, pensionTaxRate: value / 100 } })} />
-              <NumberField label={copy.eventTax} value={plan.assumptions.eventTaxRate * 100} min={0} max={100} suffix="%" onChange={(value) => onChange({ ...plan, assumptions: { ...plan.assumptions, eventTaxRate: value / 100 } })} />
-            </div></details>
+            <details className="advanced-settings" open>
+              <summary>{copy.taxSettings}</summary>
+              <div style={{ marginBottom: 12 }}>
+                <label className="check-field">
+                  <input
+                    type="checkbox"
+                    checked={plan.assumptions.useJapanTaxEngine ?? true}
+                    onChange={(e) => onChange({ ...plan, assumptions: { ...plan.assumptions, useJapanTaxEngine: e.target.checked } })}
+                  />
+                  <strong>{copy.useJapanTax}</strong>
+                </label>
+              </div>
+
+              <div className="field-grid two compact" style={{ marginBottom: 12 }}>
+                <NumberField
+                  label={copy.monthlyNisa}
+                  value={plan.assumptions.monthlyNisaContribution ?? 0}
+                  min={0}
+                  step={10_000}
+                  scale={10_000}
+                  suffix={copy.moneyUnit}
+                  onChange={(val) => onChange({ ...plan, assumptions: { ...plan.assumptions, monthlyNisaContribution: val } })}
+                />
+                <NumberField
+                  label={copy.monthlyIdeco}
+                  value={plan.assumptions.monthlyIdecoContribution ?? 0}
+                  min={0}
+                  step={5_000}
+                  scale={10_000}
+                  suffix={copy.moneyUnit}
+                  onChange={(val) => onChange({ ...plan, assumptions: { ...plan.assumptions, monthlyIdecoContribution: val } })}
+                />
+              </div>
+
+              <div className="field-grid three compact">
+                <NumberField label={copy.salaryTax} value={plan.assumptions.salaryTaxRate * 100} min={0} max={100} suffix="%" onChange={(value) => onChange({ ...plan, assumptions: { ...plan.assumptions, salaryTaxRate: value / 100 } })} />
+                <NumberField label={copy.pensionTax} value={plan.assumptions.pensionTaxRate * 100} min={0} max={100} suffix="%" onChange={(value) => onChange({ ...plan, assumptions: { ...plan.assumptions, pensionTaxRate: value / 100 } })} />
+                <NumberField label={copy.eventTax} value={plan.assumptions.eventTaxRate * 100} min={0} max={100} suffix="%" onChange={(value) => onChange({ ...plan, assumptions: { ...plan.assumptions, eventTaxRate: value / 100 } })} />
+              </div>
+            </details>
             <details className="calculation-rules"><summary>{copy.calculationRules}</summary><ul><li>{copy.ruleRealMoney}</li><li>{copy.ruleAssetTiming}</li><li>{copy.ruleRetirement}</li><li>{copy.ruleDebt}</li><li>{copy.ruleScope}</li></ul></details>
           </div>
         </details>

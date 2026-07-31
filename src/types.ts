@@ -39,6 +39,13 @@ export interface PlannerAssumptions {
   pensionTaxRate: number
   eventTaxRate: number
   borrowingRate: number
+  // Japanese Tax & Asset Bucket Options
+  useJapanTaxEngine?: boolean
+  monthlyNisaContribution?: number
+  monthlyIdecoContribution?: number
+  housingLoanBalance?: number
+  housingLoanInterestRate?: number
+  housingLoanYearsLeft?: number
 }
 
 export interface LifeEvent {
@@ -61,6 +68,19 @@ export interface PlannerV2 {
   events: LifeEvent[]
 }
 
+export interface AssetBucketBreakdown {
+  taxableAssets: number
+  nisaAssets: number
+  idecoAssets: number
+}
+
+export interface TaxBreakdown {
+  socialSecurity: number
+  incomeTax: number
+  residentTax: number
+  totalTax: number
+}
+
 export interface ProjectionRow {
   year: number
   primaryAge: number
@@ -70,6 +90,7 @@ export interface ProjectionRow {
   pensionIncome: number
   eventIncome: number
   tax: number
+  taxDetails?: TaxBreakdown
   totalIncome: number
   baseExpense: number
   medicalExpense: number
@@ -77,10 +98,19 @@ export interface ProjectionRow {
   totalExpense: number
   netCashFlow: number
   endAssets: number
+  buckets?: AssetBucketBreakdown
   eventNames: string[]
 }
 
 export type DieWithZeroStatus = '资金不足' | '接近 Die with Zero' | '结余偏高'
+
+export interface MonteCarloSummary {
+  successRate: number // 0 - 100%
+  iterations: number
+  medianTerminalAssets: number
+  p10TerminalAssets: number
+  p90TerminalAssets: number
+}
 
 export interface ProjectionSummary {
   terminalYear: number
@@ -96,9 +126,11 @@ export interface ProjectionSummary {
   requiredNominalReturn: number | null
   retirementSpendingAdjustment: number | null
   assumedNominalReturn: number
+  monteCarlo?: MonteCarloSummary
 }
 
 export interface PlanOutput {
   projection: ProjectionRow[]
   summary: ProjectionSummary
 }
+

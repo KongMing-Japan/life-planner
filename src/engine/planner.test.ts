@@ -175,4 +175,26 @@ describe('planner engine', () => {
     expect(age70.medicalExpense).toBe(1_600_000)
     expect(age70.totalExpense).toBe(6_000_000)
   })
+
+  it('calculates Japanese Progressive Tax and Social Security correctly', () => {
+    const plan = simplePlan()
+    plan.assumptions.useJapanTaxEngine = true
+    plan.adults[0].annualSalary = 6_000_000
+    plan.adults[0].retireAge = 70
+    const row = generateProjection(plan)[0]
+    expect(row.taxDetails).toBeDefined()
+    expect(row.taxDetails!.socialSecurity).toBeGreaterThan(0)
+    expect(row.taxDetails!.incomeTax).toBeGreaterThan(0)
+    expect(row.taxDetails!.residentTax).toBeGreaterThan(0)
+  })
+
+  it('runs Monte Carlo simulation and calculates success probability', () => {
+    const plan = simplePlan()
+    const output = buildPlanOutput(plan)
+    expect(output.summary.monteCarlo).toBeDefined()
+    expect(output.summary.monteCarlo!.iterations).toBeGreaterThan(0)
+    expect(output.summary.monteCarlo!.successRate).toBeGreaterThanOrEqual(0)
+    expect(output.summary.monteCarlo!.successRate).toBeLessThanOrEqual(100)
+  })
 })
+

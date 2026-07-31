@@ -94,6 +94,16 @@ export function Dashboard({ output, locale, copy }: Props) {
           <small>{output.summary.terminalYear}{copy.year} {copy.yearEnd}</small>
         </article>
 
+        {output.summary.monteCarlo && (
+          <article className="m3-stat-card kpi-card gf-kpi-card">
+            <span><Trophy />{copy.monteCarloSuccess}</span>
+            <strong className={output.summary.monteCarlo.successRate >= 80 ? 'positive' : 'negative'}>
+              {output.summary.monteCarlo.successRate}%
+            </strong>
+            <small>{copy.monteCarloTitle}</small>
+          </article>
+        )}
+
         {peakRow && (
           <article className="m3-stat-card kpi-card gf-kpi-card">
             <span><Trophy />{copy.peakAssets}</span>
