@@ -237,12 +237,12 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
             <ComposedChart data={chartData} margin={chartMargin}>
               <defs>
                 <linearGradient id="m3AssetBlue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#1a73e8" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="#1a73e8" stopOpacity={0.03} />
+                  <stop offset="0%" stopColor="#1a73e8" stopOpacity={0.25} />
+                  <stop offset="100%" stopColor="#1a73e8" stopOpacity={0.01} />
                 </linearGradient>
                 <linearGradient id="m3AssetRed" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#d93025" stopOpacity={0.05} />
-                  <stop offset="100%" stopColor="#d93025" stopOpacity={0.35} />
+                  <stop offset="0%" stopColor="#d93025" stopOpacity={0.02} />
+                  <stop offset="100%" stopColor="#d93025" stopOpacity={0.25} />
                 </linearGradient>
               </defs>
               <CartesianGrid stroke="#e0e4ec" vertical={false} strokeDasharray="3 3" />
@@ -251,8 +251,8 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
               <Tooltip content={<StoryTooltip locale={locale} copy={copy} reconciliationLabel={labels.reconciliation} />} />
               <ReferenceLine y={0} stroke="#c4c7c5" strokeWidth={1.5} />
               <ReferenceLine x={selected.primaryAge} stroke="#1a73e8" strokeDasharray="4 4" strokeWidth={1.5} />
-              <Area type="monotone" dataKey="assetPositive" stroke="#1a73e8" strokeWidth={2.8} fill="url(#m3AssetBlue)" isAnimationActive={false} />
-              <Area type="monotone" dataKey="assetNegative" stroke="#d93025" strokeWidth={2.8} fill="url(#m3AssetRed)" isAnimationActive={false} />
+              <Area type="monotone" dataKey="assetPositive" stroke="#1a73e8" strokeWidth={2.5} fill="url(#m3AssetBlue)" isAnimationActive={false} />
+              <Area type="monotone" dataKey="assetNegative" stroke="#d93025" strokeWidth={2.5} fill="url(#m3AssetRed)" isAnimationActive={false} />
               {eventRows.map((row) => (
                 <ReferenceDot key={row.year} x={row.primaryAge} y={row.endAssets} r={4} fill="#188038" stroke="#ffffff" strokeWidth={2} />
               ))}

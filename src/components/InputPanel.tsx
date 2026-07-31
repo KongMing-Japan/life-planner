@@ -176,7 +176,7 @@ export function InputPanel({ plan, onChange, locale, copy }: Props) {
       <details className="input-section events-section" open style={{ marginTop: 16 }}>
         <summary><CalendarDays /><span>{copy.events}</span><b>{plan.events.length}</b></summary>
         <div className="input-section-body">
-          <SectionHeading icon={<CalendarDays />} title={locale === 'ja' ? '06-08. 特別イベント・借入金 (Special Events & Loans)' : '06-08. 重大事件与按揭借款 (Special Events & Loans)'} />
+          <SectionHeading icon={<CalendarDays />} title={locale === 'ja' ? '06. 特別イベント・大型支出 (Special Events & Loans)' : '06. 重大事件与按揭借款 (Special Events & Loans)'} />
           <p className="section-help">{copy.eventHelp}</p>
           <div className="event-stack">
             {plan.events.map((event) => <article className={`event-editor ${event.type}`} key={event.id}>
