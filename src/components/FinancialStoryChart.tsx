@@ -237,26 +237,26 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
             <ComposedChart data={chartData} margin={chartMargin}>
               <defs>
                 <linearGradient id="m3AssetBlue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.45} />
-                  <stop offset="100%" stopColor="#0284c7" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="#1a73e8" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#1a73e8" stopOpacity={0.03} />
                 </linearGradient>
                 <linearGradient id="m3AssetRed" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.05} />
-                  <stop offset="100%" stopColor="#f43f5e" stopOpacity={0.45} />
+                  <stop offset="0%" stopColor="#d93025" stopOpacity={0.05} />
+                  <stop offset="100%" stopColor="#d93025" stopOpacity={0.35} />
                 </linearGradient>
               </defs>
-              <CartesianGrid stroke="rgba(51, 65, 85, 0.5)" vertical={false} strokeDasharray="3 3" />
-              <XAxis dataKey="primaryAge" tickLine={false} axisLine={false} minTickGap={24} tickFormatter={ageTick} tick={{ fill: '#94a3b8', fontSize: 11 }} />
-              <YAxis tickLine={false} axisLine={false} width={64} tickFormatter={moneyTick} tick={{ fill: '#94a3b8', fontSize: 11 }} />
+              <CartesianGrid stroke="#e0e4ec" vertical={false} strokeDasharray="3 3" />
+              <XAxis dataKey="primaryAge" tickLine={false} axisLine={false} minTickGap={24} tickFormatter={ageTick} tick={{ fill: '#444746', fontSize: 11 }} />
+              <YAxis tickLine={false} axisLine={false} width={64} tickFormatter={moneyTick} tick={{ fill: '#444746', fontSize: 11 }} />
               <Tooltip content={<StoryTooltip locale={locale} copy={copy} reconciliationLabel={labels.reconciliation} />} />
-              <ReferenceLine y={0} stroke="rgba(100, 116, 139, 0.6)" strokeWidth={1.5} />
-              <ReferenceLine x={selected.primaryAge} stroke="#38bdf8" strokeDasharray="4 4" strokeWidth={1.5} />
-              <Area type="monotone" dataKey="assetPositive" stroke="#38bdf8" strokeWidth={3} fill="url(#m3AssetBlue)" isAnimationActive={false} />
-              <Area type="monotone" dataKey="assetNegative" stroke="#f43f5e" strokeWidth={3} fill="url(#m3AssetRed)" isAnimationActive={false} />
+              <ReferenceLine y={0} stroke="#c4c7c5" strokeWidth={1.5} />
+              <ReferenceLine x={selected.primaryAge} stroke="#1a73e8" strokeDasharray="4 4" strokeWidth={1.5} />
+              <Area type="monotone" dataKey="assetPositive" stroke="#1a73e8" strokeWidth={2.8} fill="url(#m3AssetBlue)" isAnimationActive={false} />
+              <Area type="monotone" dataKey="assetNegative" stroke="#d93025" strokeWidth={2.8} fill="url(#m3AssetRed)" isAnimationActive={false} />
               {eventRows.map((row) => (
-                <ReferenceDot key={row.year} x={row.primaryAge} y={row.endAssets} r={4} fill="#34d399" stroke="#0b0f19" strokeWidth={2} />
+                <ReferenceDot key={row.year} x={row.primaryAge} y={row.endAssets} r={4} fill="#188038" stroke="#ffffff" strokeWidth={2} />
               ))}
-              <ReferenceDot x={selected.primaryAge} y={selected.endAssets} r={6} fill="#ffffff" stroke={selected.endAssets < 0 ? '#f43f5e' : '#38bdf8'} strokeWidth={3} />
+              <ReferenceDot x={selected.primaryAge} y={selected.endAssets} r={6} fill="#ffffff" stroke={selected.endAssets < 0 ? '#d93025' : '#1a73e8'} strokeWidth={3} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>

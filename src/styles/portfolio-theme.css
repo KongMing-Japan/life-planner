@@ -1,40 +1,48 @@
-/* Dark Executive Fintech Design System */
+/* Authentic Google Finance Material Light Design System */
 :root {
   font-family:
     "Inter Variable", Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
     "Segoe UI", "Noto Sans SC", "Noto Sans JP", sans-serif;
-  color-scheme: dark;
-  color: #f1f5f9;
-  background: #0b0f19;
+  color-scheme: light;
+  color: #202124;
+  background: #f8fafd;
 
-  --bg-canvas: #0b0f19;
-  --bg-card: rgba(15, 23, 42, 0.75);
-  --bg-card-hover: rgba(30, 41, 59, 0.85);
-  --border-color: rgba(51, 65, 85, 0.6);
-  --border-glow: rgba(56, 189, 248, 0.35);
+  --bg-canvas: #f8fafd;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --border-color: #dadce0;
+  --border-glow: rgba(26, 115, 232, 0.25);
 
-  --accent-cyan: #38bdf8;
-  --accent-blue: #0284c7;
-  --accent-indigo: #818cf8;
-  --accent-emerald: #10b981;
-  --accent-rose: #f43f5e;
+  --google-blue: #1a73e8;
+  --google-blue-hover: #1557b0;
+  --google-blue-bg: #e8f0fe;
 
-  --m3-primary: #38bdf8;
-  --m3-primary-container: rgba(2, 132, 199, 0.2);
-  --m3-on-primary-container: #7dd3fc;
+  --google-green: #188038;
+  --google-green-bg: #e6f4ea;
 
-  --m3-success-container: rgba(16, 185, 129, 0.2);
-  --m3-on-success-container: #34d399;
+  --google-red: #d93025;
+  --google-red-bg: #fce8e6;
 
-  --m3-danger-container: rgba(244, 63, 94, 0.2);
-  --m3-on-danger-container: #fb7185;
+  --google-grey-dark: #202124;
+  --google-grey-mid: #5f6368;
+  --google-grey-light: #f1f3f4;
 
-  --m3-border: rgba(51, 65, 85, 0.6);
+  --m3-primary: #1a73e8;
+  --m3-primary-container: #e8f0fe;
+  --m3-on-primary-container: #1967d2;
+
+  --m3-success-container: #e6f4ea;
+  --m3-on-success-container: #137333;
+
+  --m3-danger-container: #fce8e6;
+  --m3-on-danger-container: #c5221f;
+
+  --m3-border: #dadce0;
 }
 
 body {
-  background: #0b0f19;
-  color: #f1f5f9;
+  background: #f8fafd;
+  color: #202124;
   letter-spacing: -0.01em;
   margin: 0;
   padding: 0;
@@ -45,7 +53,7 @@ input:focus-visible,
 select:focus-visible,
 summary:focus-visible,
 a:focus-visible {
-  outline: 2px solid #38bdf8;
+  outline: 3px solid rgba(26, 115, 232, 0.24);
   outline-offset: 2px;
 }
 
@@ -56,34 +64,30 @@ a:focus-visible {
   padding-bottom: 40px;
 }
 
-/* Floating Glassmorphic Header Navigation */
+/* Floating Google Header Navigation */
 .app-header {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  background: #ffffff;
+  border: 1px solid #dadce0;
   border-radius: 16px;
   padding: 14px 20px;
   margin-bottom: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.12), 0 1px 2px rgba(60, 64, 67, 0.24);
 }
 
 .brand-block h1 {
   margin: 0;
   font-size: 24px;
   font-weight: 800;
-  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #202124;
 }
 
 .brand-block p {
   margin: 2px 0 0;
   font-size: 13px;
-  color: #94a3b8;
+  color: #5f6368;
 }
 
 .lifeos-eyebrow-nav {
@@ -97,14 +101,14 @@ a:focus-visible {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #38bdf8;
+  color: #1a73e8;
   text-decoration: none;
   font-weight: 700;
   font-size: 13px;
 }
 
 .lifeos-eyebrow-divider {
-  color: #475569;
+  color: #dadce0;
 }
 
 .lifeos-eyebrow-menu {
@@ -113,7 +117,7 @@ a:focus-visible {
 }
 
 .lifeos-menu-item {
-  color: #94a3b8;
+  color: #5f6368;
   text-decoration: none;
   font-size: 12px;
   font-weight: 600;
@@ -124,24 +128,23 @@ a:focus-visible {
 
 .lifeos-menu-item:hover,
 .lifeos-menu-item.active {
-  color: #38bdf8;
-  background: rgba(56, 189, 248, 0.1);
+  color: #1a73e8;
+  background: #e8f0fe;
 }
 
-/* Material 3 Card Bases (Dark Executive) */
+/* Google Material 3 Cards (Light Theme) */
 .m3-card {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  background: #ffffff;
+  border: 1px solid #dadce0;
   border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.08);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .m3-card:hover {
-  border-color: rgba(56, 189, 248, 0.4);
+  border-color: #1a73e8;
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.12);
 }
 
 .m3-chip {
@@ -151,27 +154,27 @@ a:focus-visible {
   border-radius: 20px;
   font-size: 12px;
   font-weight: 650;
-  background: rgba(30, 41, 59, 0.8);
-  color: #94a3b8;
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  background: #f1f3f4;
+  color: #3c4043;
+  border: 1px solid #dadce0;
 }
 
 .m3-chip.primary {
-  background: rgba(2, 132, 199, 0.25);
-  color: #38bdf8;
-  border-color: rgba(56, 189, 248, 0.4);
+  background: #e8f0fe;
+  color: #1a73e8;
+  border-color: #d2e3fc;
 }
 
 .m3-chip.success {
-  background: rgba(16, 185, 129, 0.25);
-  color: #34d399;
-  border-color: rgba(52, 211, 153, 0.4);
+  background: #e6f4ea;
+  color: #137333;
+  border-color: #ceead6;
 }
 
 .m3-chip.danger {
-  background: rgba(244, 63, 94, 0.25);
-  color: #fb7185;
-  border-color: rgba(251, 113, 133, 0.4);
+  background: #fce8e6;
+  color: #c5221f;
+  border-color: #fad2cf;
 }
 
 /* Layout Split: Input Panel Left (380px), Dashboard Right (1fr) */
@@ -187,7 +190,7 @@ a:focus-visible {
   }
 }
 
-/* Input Panel & Dark Form Controls */
+/* Input Panel & Form Controls */
 .input-panel {
   display: flex;
   flex-direction: column;
@@ -196,10 +199,10 @@ a:focus-visible {
 
 .input-mode-switch {
   display: flex;
-  background: rgba(30, 41, 59, 0.8);
+  background: #f1f3f4;
   border-radius: 12px;
   padding: 4px;
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  border: 1px solid #dadce0;
 }
 
 .input-mode-switch button {
@@ -211,7 +214,7 @@ a:focus-visible {
   padding: 8px 12px;
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: #5f6368;
   font-size: 13px;
   font-weight: 600;
   border-radius: 8px;
@@ -220,30 +223,29 @@ a:focus-visible {
 }
 
 .input-mode-switch button.active {
-  background: #0284c7;
+  background: #1a73e8;
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+  box-shadow: 0 1px 3px rgba(26, 115, 232, 0.3);
 }
 
-/* Preset Personas Metallic Dark Grid */
+/* Preset Personas Google Card Grid */
 .preset-personas-card {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  background: #ffffff;
+  border: 1px solid #dadce0;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.08);
 }
 
 .preset-personas-card button {
-  background: rgba(30, 41, 59, 0.9) !important;
-  color: #e2e8f0 !important;
-  border: 1px solid rgba(51, 65, 85, 0.8) !important;
+  background: #f8fafd !important;
+  color: #3c4043 !important;
+  border: 1px solid #dadce0 !important;
   transition: all 0.2s ease !important;
 }
 
 .preset-personas-card button:hover {
-  background: rgba(2, 132, 199, 0.3) !important;
-  border-color: #38bdf8 !important;
-  transform: translateY(-2px);
-  color: #ffffff !important;
+  background: #e8f0fe !important;
+  border-color: #1a73e8 !important;
+  color: #1a73e8 !important;
 }
 
 /* Input Fields & Number Controls */
@@ -272,7 +274,7 @@ a:focus-visible {
 .number-field span {
   font-size: 12px;
   font-weight: 600;
-  color: #94a3b8;
+  color: #5f6368;
 }
 
 .number-input-wrap {
@@ -284,25 +286,25 @@ a:focus-visible {
 .number-input-wrap input {
   width: 100%;
   padding: 8px 12px;
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(51, 65, 85, 0.8);
+  background: #ffffff;
+  border: 1px solid #dadce0;
   border-radius: 8px;
-  color: #f8fafc;
+  color: #202124;
   font-size: 14px;
   font-weight: 600;
   box-sizing: border-box;
 }
 
 .number-input-wrap input:focus {
-  border-color: #38bdf8;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
 }
 
 .number-suffix {
   position: absolute;
   right: 10px;
   font-size: 12px;
-  color: #64748b;
+  color: #80868b;
   pointer-events: none;
 }
 
@@ -320,8 +322,8 @@ a:focus-visible {
 }
 
 .gf-kpi-card {
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  background: #ffffff;
+  border: 1px solid #dadce0;
   border-radius: 14px;
   padding: 14px 16px;
   display: flex;
@@ -335,50 +337,50 @@ a:focus-visible {
   gap: 6px;
   font-size: 12px;
   font-weight: 600;
-  color: #94a3b8;
+  color: #5f6368;
 }
 
 .gf-kpi-card strong {
   font-size: 22px;
   font-weight: 800;
-  color: #f8fafc;
+  color: #202124;
   line-height: 1.2;
 }
 
-.gf-kpi-card strong.positive { color: #34d399; }
-.gf-kpi-card strong.negative { color: #fb7185; }
+.gf-kpi-card strong.positive { color: #188038; }
+.gf-kpi-card strong.negative { color: #d93025; }
 
 .gf-kpi-card small {
   font-size: 11px;
-  color: #64748b;
+  color: #80868b;
 }
 
-/* Glowing What-If Cockpit Slider Bar */
+/* What-If Cockpit Slider Bar (Google Finance Style) */
 .quicken-what-if-card {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
-  border: 1px solid rgba(56, 189, 248, 0.4);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  background: #ffffff;
+  border: 1px solid #dadce0;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.08);
   border-radius: 16px;
   padding: 18px 20px;
 }
 
 .quicken-slider-group {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(51, 65, 85, 0.8);
+  background: #f8fafd;
+  border: 1px solid #dadce0;
   border-radius: 12px;
   padding: 12px 14px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .quicken-slider-group:hover {
-  border-color: #38bdf8;
-  box-shadow: 0 0 16px rgba(56, 189, 248, 0.15);
+  border-color: #1a73e8;
+  box-shadow: 0 1px 4px rgba(26, 115, 232, 0.15);
 }
 
 .quicken-slider-group input[type="range"] {
-  accent-color: #38bdf8;
+  accent-color: #1a73e8;
   height: 6px;
-  background: rgba(51, 65, 85, 0.8);
+  background: #e8eaed;
   border-radius: 3px;
   cursor: pointer;
   width: 100%;
@@ -386,8 +388,8 @@ a:focus-visible {
 
 /* Financial Story Chart Styling */
 .story-chart-card {
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  background: #ffffff;
+  border: 1px solid #dadce0;
   border-radius: 16px;
   padding: 20px;
 }
@@ -405,7 +407,7 @@ a:focus-visible {
   margin: 4px 0 0;
   font-size: 18px;
   font-weight: 700;
-  color: #f8fafc;
+  color: #202124;
 }
 
 .story-chart-canvas-wrap {
@@ -416,8 +418,8 @@ a:focus-visible {
 
 /* Collapsible Bottom Audit Ledger */
 .bottom-audit-ledger {
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  background: #ffffff;
+  border: 1px solid #dadce0;
   border-radius: 16px;
   overflow: hidden;
 }
@@ -438,12 +440,12 @@ a:focus-visible {
 }
 
 .m3-table th {
-  background: rgba(30, 41, 59, 0.8);
-  color: #94a3b8;
+  background: #f8faee;
+  color: #444746;
   font-weight: 600;
   text-align: right;
   padding: 10px 14px;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+  border-bottom: 1px solid #dadce0;
   white-space: nowrap;
 }
 
@@ -454,24 +456,24 @@ a:focus-visible {
 
 .m3-table td {
   padding: 10px 14px;
-  border-bottom: 1px solid rgba(30, 41, 59, 0.6);
+  border-bottom: 1px solid #edf0f5;
   text-align: right;
   font-variant-numeric: tabular-nums;
-  color: #cbd5e1;
+  color: #202124;
 }
 
 .m3-table tr:hover td {
-  background: rgba(30, 41, 59, 0.5);
+  background: #f4f7fc;
 }
 
-.m3-table td.positive { color: #34d399; font-weight: 600; }
-.m3-table td.negative { color: #fb7185; font-weight: 600; }
-.m3-table td.strong { font-weight: 700; color: #ffffff; }
+.m3-table td.positive { color: #188038; font-weight: 600; }
+.m3-table td.negative { color: #c5221f; font-weight: 600; }
+.m3-table td.strong { font-weight: 700; color: #202124; }
 
 /* FP Advice List Card */
 .fp-advice-card {
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  background: #ffffff;
+  border: 1px solid #dadce0;
   border-radius: 16px;
   padding: 20px;
 }
@@ -482,13 +484,13 @@ a:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  color: #cbd5e1;
+  color: #3c4043;
   font-size: 13px;
   line-height: 1.6;
 }
 
 .fp-advice-list strong {
-  color: #38bdf8;
+  color: #1a73e8;
 }
 
 /* Footer & Disclaimer */
@@ -496,13 +498,13 @@ footer {
   margin-top: 32px;
   text-align: center;
   font-size: 12px;
-  color: #64748b;
-  border-top: 1px solid rgba(51, 65, 85, 0.4);
+  color: #5f6368;
+  border-top: 1px solid #dadce0;
   padding-top: 20px;
 }
 
 footer a {
-  color: #38bdf8;
+  color: #1a73e8;
   text-decoration: none;
 }
 
