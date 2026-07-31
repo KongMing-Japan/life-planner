@@ -177,21 +177,21 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
     </div>
 
     {/* Material 3 Toolbar (Range Switcher & Chart View Tabs) */}
-    <div className="m3-toolbar">
-      <div className="m3-range-group" role="group" aria-label="Time Horizon">
-        <button type="button" className={`m3-range-pill ${range === 'MAX' ? 'active' : ''}`} onClick={() => setRange('MAX')}>{copy.rangeMax}</button>
-        <button type="button" className={`m3-range-pill ${range === 'WORK' ? 'active' : ''}`} onClick={() => setRange('WORK')}>{copy.rangeWork}</button>
-        <button type="button" className={`m3-range-pill ${range === 'RETIRE' ? 'active' : ''}`} onClick={() => setRange('RETIRE')}>{copy.rangeRetire}</button>
-        <button type="button" className={`m3-range-pill ${range === '30s' ? 'active' : ''}`} onClick={() => setRange('30s')}>{copy.range30s}</button>
-        <button type="button" className={`m3-range-pill ${range === '40s' ? 'active' : ''}`} onClick={() => setRange('40s')}>{copy.range40s}</button>
-        <button type="button" className={`m3-range-pill ${range === '50s' ? 'active' : ''}`} onClick={() => setRange('50s')}>{copy.range50s}</button>
-        <button type="button" className={`m3-range-pill ${range === '60s' ? 'active' : ''}`} onClick={() => setRange('60s')}>{copy.range60s}</button>
+    <div className="m3-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+      <div className="m3-filter-group" role="group" aria-label="Time Horizon">
+        <button type="button" className={`m3-filter-chip ${range === 'MAX' ? 'active' : ''}`} onClick={() => setRange('MAX')}>{copy.rangeMax}</button>
+        <button type="button" className={`m3-filter-chip ${range === 'WORK' ? 'active' : ''}`} onClick={() => setRange('WORK')}>{copy.rangeWork}</button>
+        <button type="button" className={`m3-filter-chip ${range === 'RETIRE' ? 'active' : ''}`} onClick={() => setRange('RETIRE')}>{copy.rangeRetire}</button>
+        <button type="button" className={`m3-filter-chip ${range === '30s' ? 'active' : ''}`} onClick={() => setRange('30s')}>{copy.range30s}</button>
+        <button type="button" className={`m3-filter-chip ${range === '40s' ? 'active' : ''}`} onClick={() => setRange('40s')}>{copy.range40s}</button>
+        <button type="button" className={`m3-filter-chip ${range === '50s' ? 'active' : ''}`} onClick={() => setRange('50s')}>{copy.range50s}</button>
+        <button type="button" className={`m3-filter-chip ${range === '60s' ? 'active' : ''}`} onClick={() => setRange('60s')}>{copy.range60s}</button>
       </div>
 
-      <div className="m3-tab-group" role="tablist">
-        <button type="button" role="tab" aria-selected={activeTab === 'assets'} className={`m3-tab-button ${activeTab === 'assets' ? 'active' : ''}`} onClick={() => setActiveTab('assets')}>{copy.tabAssets}</button>
-        <button type="button" role="tab" aria-selected={activeTab === 'cashflow'} className={`m3-tab-button ${activeTab === 'cashflow' ? 'active' : ''}`} onClick={() => setActiveTab('cashflow')}>{copy.tabCashflow}</button>
-        <button type="button" role="tab" aria-selected={activeTab === 'gains'} className={`m3-tab-button ${activeTab === 'gains' ? 'active' : ''}`} onClick={() => setActiveTab('gains')}>{copy.tabGains}</button>
+      <div className="m3-segmented-button" role="tablist">
+        <button type="button" role="tab" aria-selected={activeTab === 'assets'} className={activeTab === 'assets' ? 'active' : ''} onClick={() => setActiveTab('assets')}>{copy.tabAssets}</button>
+        <button type="button" role="tab" aria-selected={activeTab === 'cashflow'} className={activeTab === 'cashflow' ? 'active' : ''} onClick={() => setActiveTab('cashflow')}>{copy.tabCashflow}</button>
+        <button type="button" role="tab" aria-selected={activeTab === 'gains'} className={activeTab === 'gains' ? 'active' : ''} onClick={() => setActiveTab('gains')}>{copy.tabGains}</button>
       </div>
     </div>
 

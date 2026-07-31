@@ -132,19 +132,71 @@ a:focus-visible {
   background: #e8f0fe;
 }
 
-/* Google Material 3 Cards (Light Theme) */
-.m3-card {
-  background: #ffffff;
-  border: 1px solid #dadce0;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.08);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+/* Google Material 3 Filter Chips & Segmented Controls */
+.m3-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.m3-card:hover {
+.m3-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #ffffff;
+  color: #444746;
+  border: 1px solid #747775;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.m3-filter-chip:hover {
+  background: #f8fafd;
   border-color: #1a73e8;
-  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.12);
+  color: #1a73e8;
+}
+
+.m3-filter-chip.active {
+  background: #e8f0fe;
+  color: #1a73e8;
+  border-color: #1a73e8;
+  font-weight: 700;
+}
+
+.m3-segmented-button {
+  display: inline-flex;
+  background: #f1f3f4;
+  border-radius: 12px;
+  padding: 3px;
+  border: 1px solid #dadce0;
+}
+
+.m3-segmented-button button {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5f6368;
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.m3-segmented-button button:hover {
+  color: #1a73e8;
+}
+
+.m3-segmented-button button.active {
+  background: #ffffff;
+  color: #1a73e8;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.15);
 }
 
 .m3-chip {

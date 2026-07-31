@@ -19,6 +19,7 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
   const [activeTableTab, setActiveTableTab] = useState<TableTabKey>('ledger')
 
   const primary = plan?.adults.find((adult) => adult.role === 'primary') ?? plan?.adults[0]
+  const spouse = plan?.adults.find((adult) => adult.role === 'spouse')
 
   const statusClass = output.summary.status === '资金不足' ? 'danger' : output.summary.status === '接近 Die with Zero' ? 'success' : 'primary'
   const requiredReturn = output.summary.requiredNominalReturn
@@ -122,7 +123,7 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
         <div className="quicken-slider-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginTop: 12 }}>
           <div className="quicken-slider-group">
             <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, color: '#334155' }}>
-              <span>{copy.whatIfRetireAge}</span>
+              <span>{primary.name ? `${primary.name} ${copy.retireAge}` : copy.whatIfRetireAge}</span>
               <strong style={{ color: '#0284c7' }}>{primary.retireAge} {copy.age}</strong>
             </label>
             <input
@@ -140,6 +141,29 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
               style={{ width: '100%', marginTop: 6 }}
             />
           </div>
+
+          {spouse && (
+            <div className="quicken-slider-group">
+              <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, color: '#334155' }}>
+                <span>{`${spouse.name} ${copy.retireAge}`}</span>
+                <strong style={{ color: '#0284c7' }}>{spouse.retireAge} {copy.age}</strong>
+              </label>
+              <input
+                type="range"
+                min={spouse.currentAge}
+                max={80}
+                value={spouse.retireAge}
+                onChange={(e) => {
+                  const newAge = Number(e.target.value)
+                  onPlanChange({
+                    ...plan,
+                    adults: plan.adults.map((adult) => adult.id === spouse.id ? { ...adult, retireAge: newAge } : adult),
+                  })
+                }}
+                style={{ width: '100%', marginTop: 6 }}
+              />
+            </div>
+          )}
 
           <div className="quicken-slider-group">
             <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, color: '#334155' }}>

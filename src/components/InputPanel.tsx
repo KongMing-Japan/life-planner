@@ -103,7 +103,15 @@ export function InputPanel({ plan, onChange, locale, copy }: Props) {
               </div>
             </article>)}</div>
 
-            <div className="children-heading" style={{ marginTop: 10 }}><strong>{copy.children}</strong><button className="text-button" type="button" onClick={addChild}><Plus />{copy.addChild}</button></div>
+            <div className="children-heading" style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <strong>{copy.children}</strong>
+                <small style={{ marginLeft: 8, color: '#64748b', fontSize: 11 }}>
+                  {locale === 'ja' ? '(22歳大学卒業で独立・扶養終了)' : '(22岁大学毕业自动独立解约)'}
+                </small>
+              </div>
+              <button className="text-button" type="button" onClick={addChild}><Plus />{copy.addChild}</button>
+            </div>
             <div className="children-list">{plan.children.length === 0 ? <p className="empty-copy">{copy.noChildren}</p> : plan.children.map((child) => <div className="child-row" key={child.id}><input aria-label={`${child.name} ${copy.name}`} value={child.name} onChange={(event) => updateChild(child.id, { name: event.target.value })} /><label><input aria-label={`${child.name} ${copy.age}`} type="number" min={0} max={60} value={child.currentAge} onChange={(event) => updateChild(child.id, { currentAge: Number(event.target.value) || 0 })} /><span>{copy.age}</span></label><button aria-label={`${copy.delete} ${child.name}`} type="button" onClick={() => onChange({ ...plan, children: plan.children.filter((item) => item.id !== child.id) })}><Trash2 /></button></div>)}</div>
           </section>
 
