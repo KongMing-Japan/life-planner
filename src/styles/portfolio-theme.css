@@ -483,3 +483,390 @@ footer {
     box-shadow: 0 4px 12px rgba(60, 64, 67, 0.12);
   }
 }
+
+/* ==========================================================================
+   Google Finance Visual System Rules & Components
+   ========================================================================== */
+.gf-story-card {
+  border: 1px solid #dadce0;
+  border-radius: 12px;
+  background: #fff;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.08);
+}
+
+.gf-ticker-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e8eaed;
+  padding-bottom: 16px;
+}
+
+.gf-ticker-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gf-symbol-badge {
+  background: #e8f0fe;
+  color: #1a73e8;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.gf-ticker-title h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #202124;
+}
+
+.gf-ticker-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.gf-main-price {
+  font-size: 32px;
+  font-weight: 700;
+  color: #202124;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.gf-change-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gf-change-badge.up {
+  background: #e6f4ea;
+  color: #137333;
+}
+
+.gf-change-badge.down {
+  background: #fce8e6;
+  color: #c5221f;
+}
+
+.gf-price-subtitle {
+  color: #5f6368;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+/* Toolbar & Range Selector */
+.gf-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.gf-range-selector {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.gf-pill {
+  border: 1px solid #dadce0;
+  background: #fff;
+  color: #5f6368;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.gf-pill:hover {
+  background: #f8f9fa;
+  border-color: #bdc1c6;
+  color: #202124;
+}
+
+.gf-pill.active {
+  background: #e8f0fe;
+  border-color: #1a73e8;
+  color: #1a73e8;
+}
+
+.gf-chart-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #f1f3f4;
+  padding: 3px;
+  border-radius: 8px;
+}
+
+.gf-tab {
+  border: 0;
+  background: transparent;
+  color: #5f6368;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.gf-tab:hover {
+  color: #202124;
+}
+
+.gf-tab.active {
+  background: #fff;
+  color: #1a73e8;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.12);
+}
+
+/* Tooltip & Age Control */
+.gf-tooltip {
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 12px rgba(60, 64, 67, 0.15);
+  min-width: 180px;
+}
+
+.gf-tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e8eaed;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+.gf-tooltip-event-tag {
+  background: #e6f4ea;
+  color: #137333;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.gf-tooltip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.gf-tooltip-row b {
+  font-variant-numeric: tabular-nums;
+}
+
+.gf-tooltip-row b.positive { color: #137333; }
+.gf-tooltip-row b.negative { color: #c5221f; }
+
+.gf-age-control {
+  margin-bottom: 14px;
+}
+
+.gf-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.gf-stat-grid > div {
+  padding: 10px 12px;
+  background: #f8f9fa;
+  border: 1px solid #e8eaed;
+  border-radius: 8px;
+}
+
+.gf-stat-grid span {
+  font-size: 11px;
+  color: #5f6368;
+  display: block;
+}
+
+.gf-stat-grid strong {
+  font-size: 15px;
+  font-weight: 600;
+  color: #202124;
+  font-variant-numeric: tabular-nums;
+}
+
+.gf-stat-grid strong.positive { color: #137333; }
+.gf-stat-grid strong.negative { color: #c5221f; }
+
+.gf-chart-container {
+  height: 280px;
+  margin-bottom: 16px;
+}
+
+.gf-main-chart-view {
+  width: 100%;
+  height: 100%;
+}
+
+.gf-waterfall-head {
+  border-top: 1px solid #e8eaed;
+  padding-top: 14px;
+  margin-top: 12px;
+}
+
+/* KPI Cards in Dashboard */
+.gf-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.gf-kpi-card {
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  padding: 14px 16px;
+  transition: box-shadow 150ms ease;
+}
+
+.gf-kpi-card:hover {
+  box-shadow: 0 2px 6px rgba(60, 64, 67, 0.1);
+}
+
+.gf-kpi-card strong {
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Table Tabs in Dashboard */
+.gf-details-wrapper {
+  border: 1px solid #dadce0;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.gf-details-summary {
+  list-style: none;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e8eaed;
+  background: #fff;
+  cursor: pointer;
+}
+
+.gf-table-tabs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.gf-table-tabs-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #202124;
+}
+
+.gf-table-tab-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gf-table-tab {
+  border: 1px solid #dadce0;
+  background: #fff;
+  color: #5f6368;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.gf-table-tab:hover {
+  background: #f8f9fa;
+  color: #202124;
+}
+
+.gf-table-tab.active {
+  background: #e8f0fe;
+  border-color: #1a73e8;
+  color: #1a73e8;
+}
+
+.gf-table-scroll {
+  overflow-x: auto;
+}
+
+.gf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.gf-table th {
+  background: #f8f9fa;
+  color: #5f6368;
+  font-weight: 600;
+  text-align: right;
+  padding: 10px 14px;
+  border-bottom: 1px solid #dadce0;
+  white-space: nowrap;
+}
+
+.gf-table th:first-child,
+.gf-table td:first-child {
+  text-align: left;
+}
+
+.gf-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #e8eaed;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: #202124;
+}
+
+.gf-table tr:hover td {
+  background: #f8fafd;
+}
+
+.gf-table td.positive { color: #137333; }
+.gf-table td.negative { color: #c5221f; }
+.gf-table td.strong { font-weight: 700; }
+
+.gf-event-tag {
+  display: inline-block;
+  background: #e8f0fe;
+  color: #1a73e8;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
