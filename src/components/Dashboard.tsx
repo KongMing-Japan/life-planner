@@ -17,15 +17,12 @@ type WorkspaceNavKey = 'overview' | 'chart' | 'ledger'
 
 export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
   const [activeTableTab, setActiveTableTab] = useState<TableTabKey>('ledger')
-  const [workspaceNav, setWorkspaceNav] = useState<WorkspaceNavKey>('overview')
 
   const primary = plan?.adults.find((adult) => adult.role === 'primary') ?? plan?.adults[0]
 
   const statusClass = output.summary.status === '资金不足' ? 'danger' : output.summary.status === '接近 Die with Zero' ? 'success' : 'primary'
   const requiredReturn = output.summary.requiredNominalReturn
-  const returnClass = requiredReturn === null || output.summary.assumedNominalReturn + 0.00001 < requiredReturn ? 'danger' : 'success'
   const spendingAdjustment = output.summary.retirementSpendingAdjustment
-  const spendingClass = spendingAdjustment === null || spendingAdjustment < -1 ? 'danger' : spendingAdjustment > 1 ? 'success' : 'primary'
   const spendingNote = spendingAdjustment === null ? copy.notAchievable : spendingAdjustment > 1 ? copy.canSpendMore : spendingAdjustment < -1 ? copy.mustSpendLess : copy.onTarget
 
   const peakRow = useMemo(() => {
@@ -52,36 +49,11 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
   }, [output.projection, peakRow])
 
   return <section className="dashboard-stack gf-dashboard-stack">
-    {/* Material 3 Segmented Workspace Navigation */}
-    <nav className="m3-workspace-nav" role="tablist" aria-label="Workspace Views">
-      <button
-        type="button"
-        className={workspaceNav === 'overview' ? 'active' : ''}
-        onClick={() => setWorkspaceNav('overview')}
-      >
-        {locale === 'ja' ? 'ワークスペース全景' : '工作台全景 Overview'}
-      </button>
-      <button
-        type="button"
-        className={workspaceNav === 'chart' ? 'active' : ''}
-        onClick={() => setWorkspaceNav('chart')}
-      >
-        {copy.assetsTitle}
-      </button>
-      <button
-        type="button"
-        className={workspaceNav === 'ledger' ? 'active' : ''}
-        onClick={() => setWorkspaceNav('ledger')}
-      >
-        {copy.annualDetails}
-      </button>
-    </nav>
-
-    {/* Dashboard Top Header Card */}
+    {/* Dashboard Executive Header Card */}
     <div className="m3-card dashboard-head gf-dashboard-head">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <span className="m3-chip primary">DIE WITH ZERO SIMULATION</span>
+          <span className="m3-chip primary">EXECUTIVE FINANCIAL WORKSPACE</span>
           <h1 style={{ marginTop: 8, marginBottom: 4, fontSize: 28, fontWeight: 700 }}>{copy.dashboard}</h1>
           <p style={{ margin: 0, color: '#5e5e5e', fontSize: 13 }}>
             {copy.dashboardSubtitle} · {copy.realReturn} {formatPercent(output.summary.realReturn)}
@@ -93,56 +65,54 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
       </div>
     </div>
 
-    {/* Material 3 Key Financial Stat Cards Grid */}
-    {(workspaceNav === 'overview' || workspaceNav === 'chart') && (
-      <div className="m3-stat-grid gf-kpi-grid">
+    {/* Material 3 High-Level Financial Stat Cards Grid */}
+    <div className="m3-stat-grid gf-kpi-grid">
+      <article className="m3-stat-card kpi-card gf-kpi-card">
+        <span><WalletCards />{output.summary.terminalAge}{copy.balanceAt}</span>
+        <strong>{formatMoney(output.summary.terminalAssets, locale)}</strong>
+        <small>{output.summary.terminalYear}{copy.year} {copy.yearEnd}</small>
+      </article>
+
+      {output.summary.monteCarlo && (
         <article className="m3-stat-card kpi-card gf-kpi-card">
-          <span><WalletCards />{output.summary.terminalAge}{copy.balanceAt}</span>
-          <strong>{formatMoney(output.summary.terminalAssets, locale)}</strong>
-          <small>{output.summary.terminalYear}{copy.year} {copy.yearEnd}</small>
+          <span><Trophy />{copy.monteCarloSuccess}</span>
+          <strong className={output.summary.monteCarlo.successRate >= 80 ? 'positive' : 'negative'}>
+            {output.summary.monteCarlo.successRate}%
+          </strong>
+          <small>{copy.monteCarloTitle}</small>
         </article>
+      )}
 
-        {output.summary.monteCarlo && (
-          <article className="m3-stat-card kpi-card gf-kpi-card">
-            <span><Trophy />{copy.monteCarloSuccess}</span>
-            <strong className={output.summary.monteCarlo.successRate >= 80 ? 'positive' : 'negative'}>
-              {output.summary.monteCarlo.successRate}%
-            </strong>
-            <small>{copy.monteCarloTitle}</small>
-          </article>
-        )}
-
-        {peakRow && (
-          <article className="m3-stat-card kpi-card gf-kpi-card">
-            <span><Trophy />{copy.peakAssets}</span>
-            <strong>{formatMoney(peakRow.endAssets, locale)}</strong>
-            <small>{peakRow.year}{copy.year} ({peakRow.primaryAge}{copy.age})</small>
-          </article>
-        )}
-
+      {peakRow && (
         <article className="m3-stat-card kpi-card gf-kpi-card">
-          <span><Landmark />{copy.requiredReturn}</span>
-          <strong>{requiredReturn === null ? '—' : formatPercent(requiredReturn)}</strong>
-          <small>{requiredReturn === null ? copy.notAchievable : `${copy.currentAssumption} ${formatPercent(output.summary.assumedNominalReturn)}`}</small>
+          <span><Trophy />{copy.peakAssets}</span>
+          <strong>{formatMoney(peakRow.endAssets, locale)}</strong>
+          <small>{peakRow.year}{copy.year} ({peakRow.primaryAge}{copy.age})</small>
         </article>
+      )}
 
-        <article className="m3-stat-card kpi-card gf-kpi-card">
-          <span><CalendarClock />{copy.firstShortfall}</span>
-          <strong>{output.summary.firstNegativeYear ? `${output.summary.firstNegativeAge}${copy.age}` : copy.notOccurred}</strong>
-          <small>{output.summary.firstNegativeYear ? `${output.summary.firstNegativeYear}${copy.year}` : copy.staysPositive}</small>
-        </article>
+      <article className="m3-stat-card kpi-card gf-kpi-card">
+        <span><Landmark />{copy.requiredReturn}</span>
+        <strong>{requiredReturn === null ? '—' : formatPercent(requiredReturn)}</strong>
+        <small>{requiredReturn === null ? copy.notAchievable : `${copy.currentAssumption} ${formatPercent(output.summary.assumedNominalReturn)}`}</small>
+      </article>
 
-        <article className="m3-stat-card kpi-card gf-kpi-card">
-          <span><TrendingDown />{copy.retirementAdjustment}</span>
-          <strong>{spendingAdjustment === null ? '—' : formatMoney(Math.abs(spendingAdjustment), locale)}</strong>
-          <small>{spendingNote}</small>
-        </article>
-      </div>
-    )}
+      <article className="m3-stat-card kpi-card gf-kpi-card">
+        <span><CalendarClock />{copy.firstShortfall}</span>
+        <strong>{output.summary.firstNegativeYear ? `${output.summary.firstNegativeAge}${copy.age}` : copy.notOccurred}</strong>
+        <small>{output.summary.firstNegativeYear ? `${output.summary.firstNegativeYear}${copy.year}` : copy.staysPositive}</small>
+      </article>
+
+      <article className="m3-stat-card kpi-card gf-kpi-card">
+        <span><TrendingDown />{copy.retirementAdjustment}</span>
+        <strong>{spendingAdjustment === null ? '—' : formatMoney(Math.abs(spendingAdjustment), locale)}</strong>
+        <small>{spendingNote}</small>
+      </article>
+    </div>
 
     {/* Quicken Real-Time "What-If" Interactive Decision Bar */}
-    {plan && onPlanChange && primary && (workspaceNav === 'overview' || workspaceNav === 'chart') && (
-      <div className="m3-card quicken-what-if-card" style={{ marginBottom: 16 }}>
+    {plan && onPlanChange && primary && (
+      <div className="m3-card quicken-what-if-card">
         <div className="m3-hero-header">
           <div>
             <span className="m3-chip primary">WHAT-IF INTERACTIVE ENGINE</span>
@@ -216,12 +186,10 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
       </div>
     )}
 
-    {/* Material 3 Interactive Chart Card */}
-    {(workspaceNav === 'overview' || workspaceNav === 'chart') && (
-      <FinancialStoryChart projection={output.projection} locale={locale} copy={copy} />
-    )}
+    {/* Hero Interactive Chart Card */}
+    <FinancialStoryChart projection={output.projection} locale={locale} copy={copy} />
 
-    {output.summary.firstNegativeYear && (workspaceNav === 'overview' || workspaceNav === 'chart') ? (
+    {output.summary.firstNegativeYear ? (
       <div className="risk-callout gf-risk-callout m3-card" style={{ borderLeft: '4px solid var(--m3-on-danger-container)', background: 'var(--m3-danger-container)' }}>
         <AlertTriangle style={{ color: 'var(--m3-on-danger-container)' }} />
         <div>
@@ -231,37 +199,81 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
       </div>
     ) : null}
 
-    {/* Material 3 Tabbed Table Card Suite */}
-    {(workspaceNav === 'overview' || workspaceNav === 'ledger') && (
-      <details className="annual-details gf-details-wrapper m3-table-card" id="annual-details" open>
-        <summary className="gf-details-summary m3-table-header">
-          <div className="gf-table-tabs-header" style={{ width: '100%' }}>
-            <h2>{copy.annualDetails}</h2>
-            <div className="gf-table-tab-group m3-tab-group" role="tablist">
-              <button
-                type="button"
-                className={`m3-tab-button ${activeTableTab === 'ledger' ? 'active' : ''}`}
-                onClick={(e) => { e.preventDefault(); setActiveTableTab('ledger') }}
-              >
-                {copy.tabLedger} ({output.projection.length})
-              </button>
-              <button
-                type="button"
-                className={`m3-tab-button ${activeTableTab === 'events' ? 'active' : ''}`}
-                onClick={(e) => { e.preventDefault(); setActiveTableTab('events') }}
-              >
-                {copy.tabEvents} ({eventRows.length})
-              </button>
-              <button
-                type="button"
-                className={`m3-tab-button ${activeTableTab === 'milestones' ? 'active' : ''}`}
-                onClick={(e) => { e.preventDefault(); setActiveTableTab('milestones') }}
-              >
-                {locale === 'ja' ? 'キーマイルストーン' : '关键里程碑'} ({milestoneRows.length})
-              </button>
-            </div>
-          </div>
-        </summary>
+    {/* Material 3 FP Financial Advisor Card */}
+    <article className="m3-card fp-advice-card gf-advice-card">
+      <div className="fp-advice-head gf-advice-head" style={{ marginBottom: 14 }}>
+        <span className="fp-advice-icon" style={{ background: 'var(--m3-primary-container)', color: 'var(--m3-primary)' }}>
+          <Lightbulb aria-hidden="true" />
+        </span>
+        <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>
+          {locale === 'ja' ? 'FPからのライフプラン・アドバイス' : 'FP 理财规划专家建议'}
+        </h3>
+      </div>
+      <ul className="fp-advice-list gf-advice-list">
+        <li>
+          <strong>{locale === 'ja' ? '生活防衛資金の確保' : '储备生活防卫资金'}：</strong>
+          {locale === 'ja' 
+            ? '生活費の6ヶ月〜1年分を目安に、流動性の高い現金預金（普通預金等）として手元に確保し、急な出費や収入減少に備えましょう。'
+            : '建议保留 6 个月至 1 年的生活费作为高流动性的活期存款或货币基金，应对失业、医疗等突发状况。'}
+        </li>
+        <li>
+          <strong>{locale === 'ja' ? '長期分散投資の活用' : '合理配置长期资产'}：</strong>
+          {locale === 'ja'
+            ? '想定運用利回り（4%程度）を安定して目指すため、税制優遇制度（NISA）を活用した世界分散インデックス投資などを組み込み、長期の複利効果を活かしましょう。'
+            : '为稳健达成想定收益（约4%），建议利用税收优惠政策，配置低费率的宽基指数基金，通过长期定投摊薄成本并获得复利增值。'}
+        </li>
+        <li>
+          <strong>{locale === 'ja' ? '固定費・保険のスリム化' : '精简优化家庭保障'}：</strong>
+          {locale === 'ja'
+            ? '民間の生命保険や医療保険は必要最低限にとどめ、日本の高額療養費制度などの公的保障を前提に保障の重複を徹底的に見直すことで、投資元本を増やすことが可能です。'
+            : '利用好国家基本医保与大病互助，民营商业险建议仅覆盖“无法承受的极端风险”（如家庭顶梁柱的定期寿险等），避免高额保费吞噬积累的本金。'}
+        </li>
+        <li>
+          <strong>{locale === 'ja' ? 'ライフイベント期のキャッシュフロー管理' : '动态调整与退休规划'}：</strong>
+          {locale === 'ja'
+            ? '教育費や住宅購入など大きなイベントが重なる時期は、一時的な赤字が発生しやすいため、ライフプラン上での貯蓄取り崩し計画を事前に立てておきましょう。'
+            : '购房及子女教育期易出现阶段性现金流赤字，属于正常生命周期规律。需提早储备首付及教育准备金，并在资产变动时动态修正规划。'}
+        </li>
+      </ul>
+    </article>
+
+    {/* Bottom Collapsible Itemized Audit Ledger */}
+    <details className="annual-details gf-details-wrapper m3-table-card bottom-audit-ledger" id="annual-details">
+      <summary className="gf-details-summary m3-table-header" style={{ cursor: 'pointer', padding: '14px 20px' }}>
+        <div className="gf-table-tabs-header" style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>
+            {copy.bottomLedgerTitle ?? copy.annualDetails}
+          </h2>
+          <span className="m3-chip" style={{ fontSize: 12 }}>
+            {locale === 'ja' ? 'クリックして逐年明細を展開 (Audit)' : '点击展开逐年财务明细 (Audit)'}
+          </span>
+        </div>
+      </summary>
+
+      <div style={{ marginTop: 12 }}>
+        <div className="gf-table-tab-group m3-tab-group" role="tablist" style={{ marginBottom: 12 }}>
+          <button
+            type="button"
+            className={`m3-tab-button ${activeTableTab === 'ledger' ? 'active' : ''}`}
+            onClick={(e) => { e.preventDefault(); setActiveTableTab('ledger') }}
+          >
+            {copy.tabLedger} ({output.projection.length})
+          </button>
+          <button
+            type="button"
+            className={`m3-tab-button ${activeTableTab === 'events' ? 'active' : ''}`}
+            onClick={(e) => { e.preventDefault(); setActiveTableTab('events') }}
+          >
+            {copy.tabEvents} ({eventRows.length})
+          </button>
+          <button
+            type="button"
+            className={`m3-tab-button ${activeTableTab === 'milestones' ? 'active' : ''}`}
+            onClick={(e) => { e.preventDefault(); setActiveTableTab('milestones') }}
+          >
+            {locale === 'ja' ? 'キーマイルストーン' : '关键里程碑'} ({milestoneRows.length})
+          </button>
+        </div>
 
         {/* Tab 1: Lifetime Financial Ledger Table */}
         {activeTableTab === 'ledger' && (
@@ -362,46 +374,8 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
             </table>
           </div>
         )}
-      </details>
-    )}
-
-    {/* Material 3 FP Financial Advisor Card */}
-    <article className="m3-card fp-advice-card gf-advice-card">
-      <div className="fp-advice-head gf-advice-head" style={{ marginBottom: 14 }}>
-        <span className="fp-advice-icon" style={{ background: 'var(--m3-primary-container)', color: 'var(--m3-primary)' }}>
-          <Lightbulb aria-hidden="true" />
-        </span>
-        <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>
-          {locale === 'ja' ? 'FPからのライフプラン・アドバイス' : 'FP 理财规划专家建议'}
-        </h3>
       </div>
-      <ul className="fp-advice-list gf-advice-list">
-        <li>
-          <strong>{locale === 'ja' ? '生活防衛資金の確保' : '储备生活防卫资金'}：</strong>
-          {locale === 'ja' 
-            ? '生活費の6ヶ月〜1年分を目安に、流動性の高い現金預金（普通預金等）として手元に確保し、急な出費や収入減少に備えましょう。'
-            : '建议保留 6 个月至 1 年的生活费作为高流动性的活期存款或货币基金，应对失业、医疗等突发状况。'}
-        </li>
-        <li>
-          <strong>{locale === 'ja' ? '長期分散投資の活用' : '合理配置长期资产'}：</strong>
-          {locale === 'ja'
-            ? '想定運用利回り（4%程度）を安定して目指すため、税制優遇制度（NISA）を活用した世界分散インデックス投資などを組み込み、長期の複利効果を活かしましょう。'
-            : '为稳健达成想定收益（约4%），建议利用税收优惠政策，配置低费率的宽基指数基金，通过长期定投摊薄成本并获得复利增值。'}
-        </li>
-        <li>
-          <strong>{locale === 'ja' ? '固定費・保険のスリム化' : '精简优化家庭保障'}：</strong>
-          {locale === 'ja'
-            ? '民間の生命保険や医療保険は必要最低限にとどめ、日本の高額療養費制度などの公的保障を前提に保障の重複を徹底的に見直すことで、投資元本を増やすことが可能です。'
-            : '利用好国家基本医保与大病互助，民营商业险建议仅覆盖“无法承受的极端风险”（如家庭顶梁柱的定期寿险等），避免高额保费吞噬积累的本金。'}
-        </li>
-        <li>
-          <strong>{locale === 'ja' ? 'ライフイベント期のキャッシュフロー管理' : '动态调整与退休规划'}：</strong>
-          {locale === 'ja'
-            ? '教育費や住宅購入など大きなイベントが重なる時期は、一時的な赤字が発生しやすいため、ライフプラン上での貯蓄取り崩し計画を事前に立てておきましょう。'
-            : '购房及子女教育期易出现阶段性现金流赤字，属于正常生命周期规律。需提早储备首付及教育准备金，并在资产变动时动态修正规划。'}
-        </li>
-      </ul>
-    </article>
+    </details>
   </section>
 }
 
