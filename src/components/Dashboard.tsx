@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AlertTriangle, CalendarClock, Landmark, Lightbulb, TrendingDown, TrendingUp, Trophy, WalletCards } from 'lucide-react'
+import { AlertTriangle, CalendarClock, Landmark, Lightbulb, TrendingDown, Trophy, WalletCards } from 'lucide-react'
 import type { I18nCopy, Locale } from '../i18n'
 import { formatMoney, formatPercent, statusLabel } from '../i18n'
 import type { PlanOutput } from '../types'
@@ -7,15 +7,17 @@ import { FinancialStoryChart } from './FinancialStoryChart'
 
 type Props = { output: PlanOutput; locale: Locale; copy: I18nCopy }
 type TableTabKey = 'ledger' | 'events' | 'milestones'
+type WorkspaceNavKey = 'overview' | 'chart' | 'ledger'
 
 export function Dashboard({ output, locale, copy }: Props) {
   const [activeTableTab, setActiveTableTab] = useState<TableTabKey>('ledger')
+  const [workspaceNav, setWorkspaceNav] = useState<WorkspaceNavKey>('overview')
 
-  const statusClass = output.summary.status === '资金不足' ? 'danger' : output.summary.status === '接近 Die with Zero' ? 'success' : 'neutral'
+  const statusClass = output.summary.status === '资金不足' ? 'danger' : output.summary.status === '接近 Die with Zero' ? 'success' : 'primary'
   const requiredReturn = output.summary.requiredNominalReturn
   const returnClass = requiredReturn === null || output.summary.assumedNominalReturn + 0.00001 < requiredReturn ? 'danger' : 'success'
   const spendingAdjustment = output.summary.retirementSpendingAdjustment
-  const spendingClass = spendingAdjustment === null || spendingAdjustment < -1 ? 'danger' : spendingAdjustment > 1 ? 'success' : 'neutral'
+  const spendingClass = spendingAdjustment === null || spendingAdjustment < -1 ? 'danger' : spendingAdjustment > 1 ? 'success' : 'primary'
   const spendingNote = spendingAdjustment === null ? copy.notAchievable : spendingAdjustment > 1 ? copy.canSpendMore : spendingAdjustment < -1 ? copy.mustSpendLess : copy.onTarget
 
   const peakRow = useMemo(() => {
@@ -36,207 +38,248 @@ export function Dashboard({ output, locale, copy }: Props) {
     const negative = output.projection.find((r) => r.endAssets < 0)
 
     const list = [first, retirement, peak, negative, last].filter(Boolean) as typeof output.projection
-    // Deduplicate by year
     const map = new Map<number, typeof output.projection[0]>()
     list.forEach((r) => map.set(r.year, r))
     return Array.from(map.values()).sort((a, b) => a.year - b.year)
   }, [output.projection, peakRow])
 
   return <section className="dashboard-stack gf-dashboard-stack">
-    <div className="dashboard-head gf-dashboard-head">
-      <div>
-        <span className="eyebrow gf-eyebrow">DIE WITH ZERO SIMULATION</span>
-        <h1>{copy.dashboard}</h1>
-        <p>{copy.dashboardSubtitle} · {copy.realReturn} {formatPercent(output.summary.realReturn)}</p>
-      </div>
-      <span className={`status-pill gf-status-pill ${statusClass}`}>{statusLabel(output.summary.status, copy)}</span>
-    </div>
+    {/* Material 3 Segmented Workspace Navigation */}
+    <nav className="m3-workspace-nav" role="tablist" aria-label="Workspace Views">
+      <button
+        type="button"
+        className={workspaceNav === 'overview' ? 'active' : ''}
+        onClick={() => setWorkspaceNav('overview')}
+      >
+        {locale === 'ja' ? 'ワークスペース全景' : '工作台全景 Overview'}
+      </button>
+      <button
+        type="button"
+        className={workspaceNav === 'chart' ? 'active' : ''}
+        onClick={() => setWorkspaceNav('chart')}
+      >
+        {copy.assetsTitle}
+      </button>
+      <button
+        type="button"
+        className={workspaceNav === 'ledger' ? 'active' : ''}
+        onClick={() => setWorkspaceNav('ledger')}
+      >
+        {copy.annualDetails}
+      </button>
+    </nav>
 
-    {/* Key Financial Metrics Grid (Google Finance Cards) */}
-    <div className="kpi-grid gf-kpi-grid">
-      <article className={`kpi-card gf-kpi-card ${statusClass}`}>
-        <span><WalletCards />{output.summary.terminalAge}{copy.balanceAt}</span>
-        <strong>{formatMoney(output.summary.terminalAssets, locale)}</strong>
-        <small>{output.summary.terminalYear}{copy.year} {copy.yearEnd}</small>
-      </article>
-
-      {peakRow && (
-        <article className="kpi-card gf-kpi-card success">
-          <span><Trophy />{copy.peakAssets}</span>
-          <strong>{formatMoney(peakRow.endAssets, locale)}</strong>
-          <small>{peakRow.year}{copy.year} ({peakRow.primaryAge}{copy.age})</small>
-        </article>
-      )}
-
-      <article className={`kpi-card gf-kpi-card ${returnClass}`}>
-        <span><Landmark />{copy.requiredReturn}</span>
-        <strong>{requiredReturn === null ? '—' : formatPercent(requiredReturn)}</strong>
-        <small>{requiredReturn === null ? copy.notAchievable : `${copy.currentAssumption} ${formatPercent(output.summary.assumedNominalReturn)}`}</small>
-      </article>
-
-      <article className="kpi-card gf-kpi-card">
-        <span><CalendarClock />{copy.firstShortfall}</span>
-        <strong>{output.summary.firstNegativeYear ? `${output.summary.firstNegativeAge}${copy.age}` : copy.notOccurred}</strong>
-        <small>{output.summary.firstNegativeYear ? `${output.summary.firstNegativeYear}${copy.year}` : copy.staysPositive}</small>
-      </article>
-
-      <article className={`kpi-card gf-kpi-card ${spendingClass}`}>
-        <span><TrendingDown />{copy.retirementAdjustment}</span>
-        <strong>{spendingAdjustment === null ? '—' : formatMoney(Math.abs(spendingAdjustment), locale)}</strong>
-        <small>{spendingNote}</small>
-      </article>
-    </div>
-
-    {/* Google Finance Interactive Visual Component */}
-    <FinancialStoryChart projection={output.projection} locale={locale} copy={copy} />
-
-    {output.summary.firstNegativeYear ? (
-      <div className="risk-callout gf-risk-callout">
-        <AlertTriangle />
+    {/* Dashboard Top Header Card */}
+    <div className="m3-card dashboard-head gf-dashboard-head">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <strong>{output.summary.firstNegativeAge}{copy.riskTitle}</strong>
-          <p>{copy.riskHelp}</p>
+          <span className="m3-chip primary">DIE WITH ZERO SIMULATION</span>
+          <h1 style={{ marginTop: 8, marginBottom: 4, fontSize: 28, fontWeight: 700 }}>{copy.dashboard}</h1>
+          <p style={{ margin: 0, color: '#5e5e5e', fontSize: 13 }}>
+            {copy.dashboardSubtitle} · {copy.realReturn} {formatPercent(output.summary.realReturn)}
+          </p>
+        </div>
+        <span className={`m3-chip ${statusClass}`} style={{ padding: '6px 16px', fontSize: 13, fontWeight: 700 }}>
+          {statusLabel(output.summary.status, copy)}
+        </span>
+      </div>
+    </div>
+
+    {/* Material 3 Key Financial Stat Cards Grid */}
+    {(workspaceNav === 'overview' || workspaceNav === 'chart') && (
+      <div className="m3-stat-grid gf-kpi-grid">
+        <article className="m3-stat-card kpi-card gf-kpi-card">
+          <span><WalletCards />{output.summary.terminalAge}{copy.balanceAt}</span>
+          <strong>{formatMoney(output.summary.terminalAssets, locale)}</strong>
+          <small>{output.summary.terminalYear}{copy.year} {copy.yearEnd}</small>
+        </article>
+
+        {peakRow && (
+          <article className="m3-stat-card kpi-card gf-kpi-card">
+            <span><Trophy />{copy.peakAssets}</span>
+            <strong>{formatMoney(peakRow.endAssets, locale)}</strong>
+            <small>{peakRow.year}{copy.year} ({peakRow.primaryAge}{copy.age})</small>
+          </article>
+        )}
+
+        <article className="m3-stat-card kpi-card gf-kpi-card">
+          <span><Landmark />{copy.requiredReturn}</span>
+          <strong>{requiredReturn === null ? '—' : formatPercent(requiredReturn)}</strong>
+          <small>{requiredReturn === null ? copy.notAchievable : `${copy.currentAssumption} ${formatPercent(output.summary.assumedNominalReturn)}`}</small>
+        </article>
+
+        <article className="m3-stat-card kpi-card gf-kpi-card">
+          <span><CalendarClock />{copy.firstShortfall}</span>
+          <strong>{output.summary.firstNegativeYear ? `${output.summary.firstNegativeAge}${copy.age}` : copy.notOccurred}</strong>
+          <small>{output.summary.firstNegativeYear ? `${output.summary.firstNegativeYear}${copy.year}` : copy.staysPositive}</small>
+        </article>
+
+        <article className="m3-stat-card kpi-card gf-kpi-card">
+          <span><TrendingDown />{copy.retirementAdjustment}</span>
+          <strong>{spendingAdjustment === null ? '—' : formatMoney(Math.abs(spendingAdjustment), locale)}</strong>
+          <small>{spendingNote}</small>
+        </article>
+      </div>
+    )}
+
+    {/* Material 3 Interactive Chart Card */}
+    {(workspaceNav === 'overview' || workspaceNav === 'chart') && (
+      <FinancialStoryChart projection={output.projection} locale={locale} copy={copy} />
+    )}
+
+    {output.summary.firstNegativeYear && (workspaceNav === 'overview' || workspaceNav === 'chart') ? (
+      <div className="risk-callout gf-risk-callout m3-card" style={{ borderLeft: '4px solid var(--m3-on-danger-container)', background: 'var(--m3-danger-container)' }}>
+        <AlertTriangle style={{ color: 'var(--m3-on-danger-container)' }} />
+        <div>
+          <strong style={{ color: 'var(--m3-on-danger-container)' }}>{output.summary.firstNegativeAge}{copy.riskTitle}</strong>
+          <p style={{ margin: 0, color: 'var(--m3-on-danger-container)' }}>{copy.riskHelp}</p>
         </div>
       </div>
     ) : null}
 
-    {/* Table Combination Suite (Google Finance Style Tabbed Cards & Tables) */}
-    <details className="annual-details gf-details-wrapper" id="annual-details" open>
-      <summary className="gf-details-summary">
-        <div className="gf-table-tabs-header">
-          <h2>{copy.annualDetails}</h2>
-          <div className="gf-table-tab-group" role="tablist">
-            <button
-              type="button"
-              className={`gf-table-tab ${activeTableTab === 'ledger' ? 'active' : ''}`}
-              onClick={(e) => { e.preventDefault(); setActiveTableTab('ledger') }}
-            >
-              {copy.tabLedger} ({output.projection.length})
-            </button>
-            <button
-              type="button"
-              className={`gf-table-tab ${activeTableTab === 'events' ? 'active' : ''}`}
-              onClick={(e) => { e.preventDefault(); setActiveTableTab('events') }}
-            >
-              {copy.tabEvents} ({eventRows.length})
-            </button>
-            <button
-              type="button"
-              className={`gf-table-tab ${activeTableTab === 'milestones' ? 'active' : ''}`}
-              onClick={(e) => { e.preventDefault(); setActiveTableTab('milestones') }}
-            >
-              {locale === 'ja' ? 'キーマイルストーン' : '关键里程碑'} ({milestoneRows.length})
-            </button>
+    {/* Material 3 Tabbed Table Card Suite */}
+    {(workspaceNav === 'overview' || workspaceNav === 'ledger') && (
+      <details className="annual-details gf-details-wrapper m3-table-card" id="annual-details" open>
+        <summary className="gf-details-summary m3-table-header">
+          <div className="gf-table-tabs-header" style={{ width: '100%' }}>
+            <h2>{copy.annualDetails}</h2>
+            <div className="gf-table-tab-group m3-tab-group" role="tablist">
+              <button
+                type="button"
+                className={`m3-tab-button ${activeTableTab === 'ledger' ? 'active' : ''}`}
+                onClick={(e) => { e.preventDefault(); setActiveTableTab('ledger') }}
+              >
+                {copy.tabLedger} ({output.projection.length})
+              </button>
+              <button
+                type="button"
+                className={`m3-tab-button ${activeTableTab === 'events' ? 'active' : ''}`}
+                onClick={(e) => { e.preventDefault(); setActiveTableTab('events') }}
+              >
+                {copy.tabEvents} ({eventRows.length})
+              </button>
+              <button
+                type="button"
+                className={`m3-tab-button ${activeTableTab === 'milestones' ? 'active' : ''}`}
+                onClick={(e) => { e.preventDefault(); setActiveTableTab('milestones') }}
+              >
+                {locale === 'ja' ? 'キーマイルストーン' : '关键里程碑'} ({milestoneRows.length})
+              </button>
+            </div>
           </div>
-        </div>
-      </summary>
+        </summary>
 
-      {/* Tab 1: Lifetime Financial Ledger */}
-      {activeTableTab === 'ledger' && (
-        <div className="table-scroll gf-table-scroll">
-          <table className="gf-table">
-            <thead>
-              <tr>
-                <th>{copy.yearAge}</th>
-                <th>{copy.startAssets}</th>
-                <th>{copy.afterTaxIncome}</th>
-                <th>{copy.totalExpense}</th>
-                <th>{copy.investmentGain}</th>
-                <th>{copy.endAssets}</th>
-                <th>{copy.eventColumn}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {output.projection.map((row) => (
-                <tr key={row.year}>
-                  <td><strong>{row.year}</strong><small>{row.primaryAge}{copy.age}</small></td>
-                  <td>{formatMoney(row.startAssets, locale)}</td>
-                  <td>{formatMoney(row.totalIncome, locale)}</td>
-                  <td>{formatMoney(row.totalExpense, locale)}</td>
-                  <td className={row.investmentGain < 0 ? 'negative' : 'positive'}>{formatMoney(row.investmentGain, locale)}</td>
-                  <td className={row.endAssets < 0 ? 'negative strong' : 'strong'}>{formatMoney(row.endAssets, locale)}</td>
-                  <td>{row.eventNames.join('、') || copy.noEvent}</td>
+        {/* Tab 1: Lifetime Financial Ledger Table */}
+        {activeTableTab === 'ledger' && (
+          <div className="table-scroll gf-table-scroll">
+            <table className="gf-table m3-table">
+              <thead>
+                <tr>
+                  <th>{copy.yearAge}</th>
+                  <th>{copy.startAssets}</th>
+                  <th>{copy.afterTaxIncome}</th>
+                  <th>{copy.totalExpense}</th>
+                  <th>{copy.investmentGain}</th>
+                  <th>{copy.endAssets}</th>
+                  <th>{copy.eventColumn}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Tab 2: Life Events Financial Impact */}
-      {activeTableTab === 'events' && (
-        <div className="table-scroll gf-table-scroll">
-          <table className="gf-table">
-            <thead>
-              <tr>
-                <th>{copy.yearAge}</th>
-                <th>{copy.eventColumn}</th>
-                <th>{copy.afterTaxIncome}</th>
-                <th>{copy.totalExpense}</th>
-                <th>{copy.netCashflow}</th>
-                <th>{copy.endAssets}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {eventRows.length > 0 ? (
-                eventRows.map((row) => (
+              </thead>
+              <tbody>
+                {output.projection.map((row) => (
                   <tr key={row.year}>
                     <td><strong>{row.year}</strong><small>{row.primaryAge}{copy.age}</small></td>
-                    <td><span className="gf-event-tag">{row.eventNames.join(' · ')}</span></td>
+                    <td>{formatMoney(row.startAssets, locale)}</td>
                     <td>{formatMoney(row.totalIncome, locale)}</td>
-                    <td className="negative">{formatMoney(row.totalExpense, locale)}</td>
-                    <td className={row.netCashFlow < 0 ? 'negative' : 'positive'}>{formatMoney(row.netCashFlow, locale)}</td>
+                    <td>{formatMoney(row.totalExpense, locale)}</td>
+                    <td className={row.investmentGain < 0 ? 'negative' : 'positive'}>{formatMoney(row.investmentGain, locale)}</td>
+                    <td className={row.endAssets < 0 ? 'negative strong' : 'strong'}>{formatMoney(row.endAssets, locale)}</td>
+                    <td>{row.eventNames.join('、') || copy.noEvent}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Tab 2: Life Events Impact Table */}
+        {activeTableTab === 'events' && (
+          <div className="table-scroll gf-table-scroll">
+            <table className="gf-table m3-table">
+              <thead>
+                <tr>
+                  <th>{copy.yearAge}</th>
+                  <th>{copy.eventColumn}</th>
+                  <th>{copy.afterTaxIncome}</th>
+                  <th>{copy.totalExpense}</th>
+                  <th>{copy.netCashflow}</th>
+                  <th>{copy.endAssets}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {eventRows.length > 0 ? (
+                  eventRows.map((row) => (
+                    <tr key={row.year}>
+                      <td><strong>{row.year}</strong><small>{row.primaryAge}{copy.age}</small></td>
+                      <td><span className="m3-chip primary">{row.eventNames.join(' · ')}</span></td>
+                      <td>{formatMoney(row.totalIncome, locale)}</td>
+                      <td className="negative">{formatMoney(row.totalExpense, locale)}</td>
+                      <td className={row.netCashFlow < 0 ? 'negative' : 'positive'}>{formatMoney(row.netCashFlow, locale)}</td>
+                      <td className={row.endAssets < 0 ? 'negative strong' : 'strong'}>{formatMoney(row.endAssets, locale)}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} style={{ textAlign: 'center', color: '#747775', padding: '2rem' }}>
+                      {copy.noEvent}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Tab 3: Milestones Summary Table */}
+        {activeTableTab === 'milestones' && (
+          <div className="table-scroll gf-table-scroll">
+            <table className="gf-table m3-table">
+              <thead>
+                <tr>
+                  <th>{copy.yearAge}</th>
+                  <th>{copy.startAssets}</th>
+                  <th>{copy.afterTaxIncome}</th>
+                  <th>{copy.totalExpense}</th>
+                  <th>{copy.investmentGain}</th>
+                  <th>{copy.endAssets}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {milestoneRows.map((row) => (
+                  <tr key={row.year}>
+                    <td><strong>{row.year}</strong><small>{row.primaryAge}{copy.age}</small></td>
+                    <td>{formatMoney(row.startAssets, locale)}</td>
+                    <td>{formatMoney(row.totalIncome, locale)}</td>
+                    <td>{formatMoney(row.totalExpense, locale)}</td>
+                    <td className={row.investmentGain < 0 ? 'negative' : 'positive'}>{formatMoney(row.investmentGain, locale)}</td>
                     <td className={row.endAssets < 0 ? 'negative strong' : 'strong'}>{formatMoney(row.endAssets, locale)}</td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', color: '#5f6368', padding: '1.5rem' }}>
-                    {copy.noEvent}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </details>
+    )}
 
-      {/* Tab 3: Milestones Summary */}
-      {activeTableTab === 'milestones' && (
-        <div className="table-scroll gf-table-scroll">
-          <table className="gf-table">
-            <thead>
-              <tr>
-                <th>{copy.yearAge}</th>
-                <th>{copy.startAssets}</th>
-                <th>{copy.afterTaxIncome}</th>
-                <th>{copy.totalExpense}</th>
-                <th>{copy.investmentGain}</th>
-                <th>{copy.endAssets}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {milestoneRows.map((row) => (
-                <tr key={row.year}>
-                  <td><strong>{row.year}</strong><small>{row.primaryAge}{copy.age}</small></td>
-                  <td>{formatMoney(row.startAssets, locale)}</td>
-                  <td>{formatMoney(row.totalIncome, locale)}</td>
-                  <td>{formatMoney(row.totalExpense, locale)}</td>
-                  <td className={row.investmentGain < 0 ? 'negative' : 'positive'}>{formatMoney(row.investmentGain, locale)}</td>
-                  <td className={row.endAssets < 0 ? 'negative strong' : 'strong'}>{formatMoney(row.endAssets, locale)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </details>
-
-    {/* FP Financial Advisory Card */}
-    <article className="fp-advice-card gf-advice-card">
-      <div className="fp-advice-head gf-advice-head">
-        <span className="fp-advice-icon"><Lightbulb aria-hidden="true" /></span>
-        <h3>{locale === 'ja' ? 'FPからのライフプラン・アドバイス' : 'FP 理财规划专家建议'}</h3>
+    {/* Material 3 FP Financial Advisor Card */}
+    <article className="m3-card fp-advice-card gf-advice-card">
+      <div className="fp-advice-head gf-advice-head" style={{ marginBottom: 14 }}>
+        <span className="fp-advice-icon" style={{ background: 'var(--m3-primary-container)', color: 'var(--m3-primary)' }}>
+          <Lightbulb aria-hidden="true" />
+        </span>
+        <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>
+          {locale === 'ja' ? 'FPからのライフプラン・アドバイス' : 'FP 理财规划专家建议'}
+        </h3>
       </div>
       <ul className="fp-advice-list gf-advice-list">
         <li>
@@ -267,4 +310,5 @@ export function Dashboard({ output, locale, copy }: Props) {
     </article>
   </section>
 }
+
 

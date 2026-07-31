@@ -31,10 +31,10 @@ const chartMargin = { top: 14, right: 18, left: 0, bottom: 4 }
 function StoryTooltip({ active, payload, locale, copy }: { active?: boolean; payload?: TooltipPayload[]; locale: Locale; copy: I18nCopy }) {
   const row = payload?.[0]?.payload
   if (!active || !row) return null
-  return <div className="chart-tooltip gf-tooltip">
+  return <div className="chart-tooltip gf-tooltip m3-tooltip">
     <div className="gf-tooltip-header">
       <strong>{row.year}{copy.year} · {row.primaryAge}{copy.age}</strong>
-      {row.eventNames.length ? <span className="gf-tooltip-event-tag">{row.eventNames.join(' · ')}</span> : null}
+      {row.eventNames.length ? <span className="m3-chip success">{row.eventNames.join(' · ')}</span> : null}
     </div>
     <div className="gf-tooltip-body">
       <div className="gf-tooltip-row">
@@ -126,8 +126,8 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
   ), [chartData])
 
   const labels = locale === 'ja'
-    ? { order: 'GOOGLE FINANCE STYLE', selectedAge: '選択年齢', reconciliation: '年間資産の内訳', noEvent: '大型イベントなし', rounding: '万円単位は四捨五入' }
-    : { order: 'GOOGLE FINANCE STYLE', selectedAge: '选择年龄', reconciliation: '年度资产核算', noEvent: '无大型事件', rounding: '万日元单位四舍五入' }
+    ? { order: 'MATERIAL 3 WORKSPACE', selectedAge: '選択年齢', reconciliation: '年間資産の内訳', noEvent: '大型イベントなし', rounding: '万円単位は四捨五入' }
+    : { order: 'MATERIAL 3 WORKSPACE', selectedAge: '选择年龄', reconciliation: '年度资产核算', noEvent: '无大型事件', rounding: '万日元单位四舍五入' }
 
   const moneyTick = (value: number) => formatMoney(Number(value), locale)
   const ageTick = (age: number) => `${age}${copy.age}`
@@ -153,44 +153,46 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
   const position = (value: number) => ((value - domainMinimum) / domainRange) * 100
   const zeroPosition = position(0)
 
-  return <article className="chart-card chart-card-primary financial-story-card gf-story-card">
-    {/* Google Finance Ticker & Header Banner */}
-    <div className="gf-ticker-header">
-      <div className="gf-ticker-title">
-        <span className="gf-symbol-badge">LIFEOS</span>
+  return <article className="m3-card financial-story-card gf-story-card">
+    {/* Material 3 Hero Metric Header */}
+    <div className="m3-hero-header">
+      <div className="m3-hero-title-group">
+        <span className="m3-chip primary">LIFEOS PLANNER</span>
         <h2>{copy.assetsTitle}</h2>
       </div>
-      <div className="gf-ticker-price-row">
-        <span className="gf-main-price">{formatMoney(selected.endAssets, locale)}</span>
-        <span className={`gf-change-badge ${isPositiveGrowth ? 'up' : 'down'}`}>
+      <div className="m3-hero-price-group">
+        <div className="m3-hero-price">{formatMoney(selected.endAssets, locale)}</div>
+        <span className={`m3-chip ${isPositiveGrowth ? 'success' : 'danger'}`}>
           {isPositiveGrowth ? '▲ +' : '▼ '}
           {formatMoney(Math.abs(netGrowth), locale)} ({isPositiveGrowth ? '+' : ''}{growthPercent.toFixed(1)}%)
         </span>
-        <span className="gf-price-subtitle">{`${selected.primaryAge}${copy.age}`} {copy.balanceAt}</span>
+        <small style={{ display: 'block', marginTop: 4, color: '#747775' }}>
+          {selected.primaryAge}{copy.age} {copy.balanceAt}
+        </small>
       </div>
     </div>
 
-    {/* Toolbar: Range Pills & View Mode Tabs */}
-    <div className="gf-toolbar">
-      <div className="gf-range-selector" role="group" aria-label="Time Horizon">
-        <button type="button" className={`gf-pill ${range === 'MAX' ? 'active' : ''}`} onClick={() => setRange('MAX')}>{copy.rangeMax}</button>
-        <button type="button" className={`gf-pill ${range === 'WORK' ? 'active' : ''}`} onClick={() => setRange('WORK')}>{copy.rangeWork}</button>
-        <button type="button" className={`gf-pill ${range === 'RETIRE' ? 'active' : ''}`} onClick={() => setRange('RETIRE')}>{copy.rangeRetire}</button>
-        <button type="button" className={`gf-pill ${range === '30s' ? 'active' : ''}`} onClick={() => setRange('30s')}>{copy.range30s}</button>
-        <button type="button" className={`gf-pill ${range === '40s' ? 'active' : ''}`} onClick={() => setRange('40s')}>{copy.range40s}</button>
-        <button type="button" className={`gf-pill ${range === '50s' ? 'active' : ''}`} onClick={() => setRange('50s')}>{copy.range50s}</button>
-        <button type="button" className={`gf-pill ${range === '60s' ? 'active' : ''}`} onClick={() => setRange('60s')}>{copy.range60s}</button>
+    {/* Material 3 Toolbar (Range Switcher & Chart View Tabs) */}
+    <div className="m3-toolbar">
+      <div className="m3-range-group" role="group" aria-label="Time Horizon">
+        <button type="button" className={`m3-range-pill ${range === 'MAX' ? 'active' : ''}`} onClick={() => setRange('MAX')}>{copy.rangeMax}</button>
+        <button type="button" className={`m3-range-pill ${range === 'WORK' ? 'active' : ''}`} onClick={() => setRange('WORK')}>{copy.rangeWork}</button>
+        <button type="button" className={`m3-range-pill ${range === 'RETIRE' ? 'active' : ''}`} onClick={() => setRange('RETIRE')}>{copy.rangeRetire}</button>
+        <button type="button" className={`m3-range-pill ${range === '30s' ? 'active' : ''}`} onClick={() => setRange('30s')}>{copy.range30s}</button>
+        <button type="button" className={`m3-range-pill ${range === '40s' ? 'active' : ''}`} onClick={() => setRange('40s')}>{copy.range40s}</button>
+        <button type="button" className={`m3-range-pill ${range === '50s' ? 'active' : ''}`} onClick={() => setRange('50s')}>{copy.range50s}</button>
+        <button type="button" className={`m3-range-pill ${range === '60s' ? 'active' : ''}`} onClick={() => setRange('60s')}>{copy.range60s}</button>
       </div>
 
-      <div className="gf-chart-tabs" role="tablist">
-        <button type="button" role="tab" aria-selected={activeTab === 'assets'} className={`gf-tab ${activeTab === 'assets' ? 'active' : ''}`} onClick={() => setActiveTab('assets')}>{copy.tabAssets}</button>
-        <button type="button" role="tab" aria-selected={activeTab === 'cashflow'} className={`gf-tab ${activeTab === 'cashflow' ? 'active' : ''}`} onClick={() => setActiveTab('cashflow')}>{copy.tabCashflow}</button>
-        <button type="button" role="tab" aria-selected={activeTab === 'gains'} className={`gf-tab ${activeTab === 'gains' ? 'active' : ''}`} onClick={() => setActiveTab('gains')}>{copy.tabGains}</button>
+      <div className="m3-tab-group" role="tablist">
+        <button type="button" role="tab" aria-selected={activeTab === 'assets'} className={`m3-tab-button ${activeTab === 'assets' ? 'active' : ''}`} onClick={() => setActiveTab('assets')}>{copy.tabAssets}</button>
+        <button type="button" role="tab" aria-selected={activeTab === 'cashflow'} className={`m3-tab-button ${activeTab === 'cashflow' ? 'active' : ''}`} onClick={() => setActiveTab('cashflow')}>{copy.tabCashflow}</button>
+        <button type="button" role="tab" aria-selected={activeTab === 'gains'} className={`m3-tab-button ${activeTab === 'gains' ? 'active' : ''}`} onClick={() => setActiveTab('gains')}>{copy.tabGains}</button>
       </div>
     </div>
 
-    {/* Interactive Age Range Scrubber */}
-    <label className="story-age-control gf-age-control">
+    {/* Age Range Slider Input */}
+    <label className="story-age-control gf-age-control" style={{ marginBottom: 16 }}>
       <span>{labels.selectedAge}<strong>{`${selected.primaryAge}${copy.age}`}</strong> <small>({selected.year}{copy.year})</small></span>
       <input
         aria-label={labels.selectedAge}
@@ -203,42 +205,54 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
       />
     </label>
 
-    {/* Quick Stat Pill Highlights */}
-    <div className="story-stat-grid gf-stat-grid" aria-live="polite">
-      <div><span>{copy.endAssets}</span><strong className={selected.endAssets < 0 ? 'negative' : 'positive'}>{formatMoney(selected.endAssets, locale)}</strong></div>
-      <div><span>{copy.netCashflow}</span><strong className={selected.netCashFlow < 0 ? 'negative' : 'positive'}>{formatMoney(selected.netCashFlow, locale)}</strong></div>
-      <div><span>{copy.investmentGain}</span><strong className={selected.investmentGain < 0 ? 'negative' : 'positive'}>{formatMoney(selected.investmentGain, locale)}</strong></div>
-      <div><span>{copy.afterTaxIncome}</span><strong className="positive">{formatMoney(selected.totalIncome, locale)}</strong></div>
+    {/* Material 3 Quick Stat Highlight Grid */}
+    <div className="m3-stat-grid" aria-live="polite">
+      <div className="m3-stat-card">
+        <span>{copy.endAssets}</span>
+        <strong className={selected.endAssets < 0 ? 'negative' : 'positive'}>{formatMoney(selected.endAssets, locale)}</strong>
+      </div>
+      <div className="m3-stat-card">
+        <span>{copy.netCashflow}</span>
+        <strong className={selected.netCashFlow < 0 ? 'negative' : 'positive'}>{formatMoney(selected.netCashFlow, locale)}</strong>
+      </div>
+      <div className="m3-stat-card">
+        <span>{copy.investmentGain}</span>
+        <strong className={selected.investmentGain < 0 ? 'negative' : 'positive'}>{formatMoney(selected.investmentGain, locale)}</strong>
+      </div>
+      <div className="m3-stat-card">
+        <span>{copy.afterTaxIncome}</span>
+        <strong className="positive">{formatMoney(selected.totalIncome, locale)}</strong>
+      </div>
     </div>
 
-    {/* Main Visualization Container */}
+    {/* Chart Render Canvas */}
     <div className="story-chart gf-chart-container" aria-label={`${copy.assetsTitle} · ${copy.cashflowTitle}`}>
       {activeTab === 'assets' && (
         <div className="story-assets-chart gf-main-chart-view">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData} margin={chartMargin}>
               <defs>
-                <linearGradient id="gfAssetBlue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#1a73e8" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="#1a73e8" stopOpacity={0.02} />
+                <linearGradient id="m3AssetBlue" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#0b57d0" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="#0b57d0" stopOpacity={0.03} />
                 </linearGradient>
-                <linearGradient id="gfAssetRed" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#d93025" stopOpacity={0.05} />
-                  <stop offset="100%" stopColor="#d93025" stopOpacity={0.3} />
+                <linearGradient id="m3AssetRed" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#b3261e" stopOpacity={0.05} />
+                  <stop offset="100%" stopColor="#b3261e" stopOpacity={0.35} />
                 </linearGradient>
               </defs>
-              <CartesianGrid stroke="#e8eaed" vertical={false} strokeDasharray="3 3" />
-              <XAxis dataKey="primaryAge" tickLine={false} axisLine={false} minTickGap={24} tickFormatter={ageTick} tick={{ fill: '#5f6368', fontSize: 11 }} />
-              <YAxis tickLine={false} axisLine={false} width={64} tickFormatter={moneyTick} tick={{ fill: '#5f6368', fontSize: 11 }} />
+              <CartesianGrid stroke="#e0e4ec" vertical={false} strokeDasharray="3 3" />
+              <XAxis dataKey="primaryAge" tickLine={false} axisLine={false} minTickGap={24} tickFormatter={ageTick} tick={{ fill: '#444746', fontSize: 11 }} />
+              <YAxis tickLine={false} axisLine={false} width={64} tickFormatter={moneyTick} tick={{ fill: '#444746', fontSize: 11 }} />
               <Tooltip content={<StoryTooltip locale={locale} copy={copy} />} />
-              <ReferenceLine y={0} stroke="#dadce0" strokeWidth={1.5} />
-              <ReferenceLine x={selected.primaryAge} stroke="#1a73e8" strokeDasharray="4 4" strokeWidth={1.5} />
-              <Area type="monotone" dataKey="assetPositive" stroke="#1a73e8" strokeWidth={2.5} fill="url(#gfAssetBlue)" isAnimationActive={false} />
-              <Area type="monotone" dataKey="assetNegative" stroke="#d93025" strokeWidth={2.5} fill="url(#gfAssetRed)" isAnimationActive={false} />
+              <ReferenceLine y={0} stroke="#c4c7c5" strokeWidth={1.5} />
+              <ReferenceLine x={selected.primaryAge} stroke="#0b57d0" strokeDasharray="4 4" strokeWidth={1.5} />
+              <Area type="monotone" dataKey="assetPositive" stroke="#0b57d0" strokeWidth={2.8} fill="url(#m3AssetBlue)" isAnimationActive={false} />
+              <Area type="monotone" dataKey="assetNegative" stroke="#b3261e" strokeWidth={2.8} fill="url(#m3AssetRed)" isAnimationActive={false} />
               {eventRows.map((row) => (
-                <ReferenceDot key={row.year} x={row.primaryAge} y={row.endAssets} r={4} fill="#188038" stroke="#fff" strokeWidth={2} />
+                <ReferenceDot key={row.year} x={row.primaryAge} y={row.endAssets} r={4} fill="#146c2e" stroke="#fff" strokeWidth={2} />
               ))}
-              <ReferenceDot x={selected.primaryAge} y={selected.endAssets} r={6} fill="#fff" stroke={selected.endAssets < 0 ? '#d93025' : '#1a73e8'} strokeWidth={3} />
+              <ReferenceDot x={selected.primaryAge} y={selected.endAssets} r={6} fill="#fff" stroke={selected.endAssets < 0 ? '#b3261e' : '#0b57d0'} strokeWidth={3} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -248,15 +262,15 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
         <div className="story-cashflow-chart gf-main-chart-view">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData} margin={{ ...chartMargin, bottom: 8 }} barCategoryGap="12%" stackOffset="sign">
-              <CartesianGrid stroke="#e8eaed" vertical={false} strokeDasharray="3 3" />
-              <XAxis dataKey="primaryAge" tickLine={false} axisLine={false} minTickGap={24} tickFormatter={ageTick} tick={{ fill: '#5f6368', fontSize: 11 }} />
-              <YAxis tickLine={false} axisLine={false} width={64} tickFormatter={moneyTick} tick={{ fill: '#5f6368', fontSize: 11 }} />
+              <CartesianGrid stroke="#e0e4ec" vertical={false} strokeDasharray="3 3" />
+              <XAxis dataKey="primaryAge" tickLine={false} axisLine={false} minTickGap={24} tickFormatter={ageTick} tick={{ fill: '#444746', fontSize: 11 }} />
+              <YAxis tickLine={false} axisLine={false} width={64} tickFormatter={moneyTick} tick={{ fill: '#444746', fontSize: 11 }} />
               <Tooltip content={<StoryTooltip locale={locale} copy={copy} />} />
-              <ReferenceLine y={0} stroke="#dadce0" strokeWidth={1.5} />
-              <ReferenceLine x={selected.primaryAge} stroke="#1a73e8" strokeDasharray="4 4" strokeWidth={1.5} />
-              <Bar dataKey="totalIncome" stackId="annual" fill="#1a73e8" maxBarSize={16} radius={[3, 3, 0, 0]} isAnimationActive={false} />
-              <Bar dataKey="expenseBar" stackId="annual" fill="#d93025" maxBarSize={16} radius={[0, 0, 3, 3]} isAnimationActive={false} />
-              <Line type="monotone" dataKey="netCashFlow" stroke="#f9ab00" strokeWidth={2.2} dot={false} isAnimationActive={false} />
+              <ReferenceLine y={0} stroke="#c4c7c5" strokeWidth={1.5} />
+              <ReferenceLine x={selected.primaryAge} stroke="#0b57d0" strokeDasharray="4 4" strokeWidth={1.5} />
+              <Bar dataKey="totalIncome" stackId="annual" fill="#0b57d0" maxBarSize={16} radius={[4, 4, 0, 0]} isAnimationActive={false} />
+              <Bar dataKey="expenseBar" stackId="annual" fill="#b3261e" maxBarSize={16} radius={[0, 0, 4, 4]} isAnimationActive={false} />
+              <Line type="monotone" dataKey="netCashFlow" stroke="#e37100" strokeWidth={2.4} dot={false} isAnimationActive={false} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -267,19 +281,19 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData} margin={chartMargin}>
               <defs>
-                <linearGradient id="gfGainsGreen" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#188038" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="#188038" stopOpacity={0.05} />
+                <linearGradient id="m3GainsGreen" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#146c2e" stopOpacity={0.45} />
+                  <stop offset="100%" stopColor="#146c2e" stopOpacity={0.04} />
                 </linearGradient>
               </defs>
-              <CartesianGrid stroke="#e8eaed" vertical={false} strokeDasharray="3 3" />
-              <XAxis dataKey="primaryAge" tickLine={false} axisLine={false} minTickGap={24} tickFormatter={ageTick} tick={{ fill: '#5f6368', fontSize: 11 }} />
-              <YAxis tickLine={false} axisLine={false} width={64} tickFormatter={moneyTick} tick={{ fill: '#5f6368', fontSize: 11 }} />
+              <CartesianGrid stroke="#e0e4ec" vertical={false} strokeDasharray="3 3" />
+              <XAxis dataKey="primaryAge" tickLine={false} axisLine={false} minTickGap={24} tickFormatter={ageTick} tick={{ fill: '#444746', fontSize: 11 }} />
+              <YAxis tickLine={false} axisLine={false} width={64} tickFormatter={moneyTick} tick={{ fill: '#444746', fontSize: 11 }} />
               <Tooltip content={<StoryTooltip locale={locale} copy={copy} />} />
-              <ReferenceLine y={0} stroke="#dadce0" strokeWidth={1.5} />
-              <ReferenceLine x={selected.primaryAge} stroke="#1a73e8" strokeDasharray="4 4" strokeWidth={1.5} />
-              <Area type="monotone" dataKey="endAssets" stroke="#188038" strokeWidth={2.5} fill="url(#gfGainsGreen)" isAnimationActive={false} />
-              <Line type="monotone" dataKey="principalBase" stroke="#5f6368" strokeWidth={1.8} strokeDasharray="3 3" dot={false} isAnimationActive={false} />
+              <ReferenceLine y={0} stroke="#c4c7c5" strokeWidth={1.5} />
+              <ReferenceLine x={selected.primaryAge} stroke="#0b57d0" strokeDasharray="4 4" strokeWidth={1.5} />
+              <Area type="monotone" dataKey="endAssets" stroke="#146c2e" strokeWidth={2.8} fill="url(#m3GainsGreen)" isAnimationActive={false} />
+              <Line type="monotone" dataKey="principalBase" stroke="#747775" strokeWidth={1.8} strokeDasharray="3 3" dot={false} isAnimationActive={false} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -309,4 +323,5 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
     </div>
   </article>
 }
+
 
