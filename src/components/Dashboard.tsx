@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AlertTriangle, CalendarClock, Landmark, Lightbulb, TrendingDown, Trophy, WalletCards } from 'lucide-react'
+import { AlertTriangle, CalendarClock, ChevronDown, Landmark, Lightbulb, TrendingDown, Trophy, WalletCards } from 'lucide-react'
 import type { I18nCopy, Locale } from '../i18n'
 import { formatMoney, formatPercent, statusLabel } from '../i18n'
 import type { PlannerV2, PlanOutput } from '../types'
@@ -241,8 +241,9 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
     <details className="annual-details gf-details-wrapper m3-table-card bottom-audit-ledger" id="annual-details">
       <summary className="gf-details-summary m3-table-header" style={{ cursor: 'pointer', padding: '14px 20px' }}>
         <div className="gf-table-tabs-header" style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>
-            {copy.bottomLedgerTitle ?? copy.annualDetails}
+          <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <ChevronDown className="summary-chevron" size={18} style={{ transition: 'transform 0.2s ease' }} />
+            <span>{copy.bottomLedgerTitle ?? copy.annualDetails}</span>
           </h2>
           <span className="m3-chip" style={{ fontSize: 12 }}>
             {locale === 'ja' ? 'クリックして逐年明細を展開 (Audit)' : '点击展开逐年财务明细 (Audit)'}
@@ -250,26 +251,26 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
         </div>
       </summary>
 
-      <div style={{ marginTop: 12 }}>
+      <div style={{ marginTop: 12, padding: '0 20px 20px' }}>
         <div className="gf-table-tab-group m3-tab-group" role="tablist" style={{ marginBottom: 12 }}>
           <button
             type="button"
             className={`m3-tab-button ${activeTableTab === 'ledger' ? 'active' : ''}`}
-            onClick={(e) => { e.preventDefault(); setActiveTableTab('ledger') }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTableTab('ledger') }}
           >
             {copy.tabLedger} ({output.projection.length})
           </button>
           <button
             type="button"
             className={`m3-tab-button ${activeTableTab === 'events' ? 'active' : ''}`}
-            onClick={(e) => { e.preventDefault(); setActiveTableTab('events') }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTableTab('events') }}
           >
             {copy.tabEvents} ({eventRows.length})
           </button>
           <button
             type="button"
             className={`m3-tab-button ${activeTableTab === 'milestones' ? 'active' : ''}`}
-            onClick={(e) => { e.preventDefault(); setActiveTableTab('milestones') }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTableTab('milestones') }}
           >
             {locale === 'ja' ? 'キーマイルストーン' : '关键里程碑'} ({milestoneRows.length})
           </button>

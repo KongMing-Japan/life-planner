@@ -427,10 +427,19 @@ a:focus-visible {
 .bottom-audit-ledger summary {
   list-style: none;
   user-select: none;
+  transition: background 0.2s ease;
+}
+
+.bottom-audit-ledger summary:hover {
+  background: #f1f5f9;
 }
 
 .bottom-audit-ledger summary::-webkit-details-marker {
   display: none;
+}
+
+details[open].bottom-audit-ledger .summary-chevron {
+  transform: rotate(180deg);
 }
 
 .m3-table {
