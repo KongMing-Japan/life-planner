@@ -34,12 +34,13 @@ export interface PlannerAssumptions {
   endAge: number
   initialAssets: number
   nominalReturn: number
+  postRetirementReturn?: number
   inflation: number
   salaryTaxRate: number
   pensionTaxRate: number
   eventTaxRate: number
   borrowingRate: number
-  // Japanese Tax & Asset Bucket Options
+  // Quicken & Japanese Tax Engine Options
   useJapanTaxEngine?: boolean
   monthlyNisaContribution?: number
   monthlyIdecoContribution?: number

@@ -233,6 +233,11 @@ export function generateProjection(plan: PlannerV2): ProjectionRow[] {
 
     const totalIncome = salaryIncome + pensionIncome + eventIncome - tax
     const retiredHousehold = offset >= retirementOffset
+    const currentNominalReturn = retiredHousehold && plan.assumptions.postRetirementReturn !== undefined
+      ? plan.assumptions.postRetirementReturn
+      : plan.assumptions.nominalReturn
+    const realReturn = calculateRealReturn(currentNominalReturn, plan.assumptions.inflation)
+
     const baseExpense =
       (retiredHousehold
         ? plan.expenses.housingAfterRetirement + plan.expenses.livingAfterRetirement
