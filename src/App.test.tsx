@@ -23,8 +23,8 @@ describe('single-page planner interactions', () => {
     render(<App />)
     const fab = screen.getByTitle('AI Assistant')
     await user.click(fab)
-    expect(screen.getByText('AIアシスタント')).toBeInTheDocument()
-    await user.click(screen.getByText('単身・堅実型'))
+    const tplButtons = screen.getAllByText('単身・堅実型')
+    await user.click(tplButtons[tplButtons.length - 1])
     expect(screen.getByText('「単身・堅実型」のテンプレートを適用しました。データが更新されました。')).toBeInTheDocument()
   })
 

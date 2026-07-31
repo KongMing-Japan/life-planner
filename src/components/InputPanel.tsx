@@ -4,6 +4,8 @@ import type { I18nCopy, Locale } from '../i18n'
 import type { Adult, Child, LifeEvent, PlannerV2 } from '../types'
 import { NumberField, SectionHeading } from './Fields'
 
+import { templates } from '../data/defaultPlan'
+
 type Props = { plan: PlannerV2; onChange: (plan: PlannerV2) => void; locale: Locale; copy: I18nCopy }
 type InputMode = 'simple' | 'detailed'
 
@@ -67,6 +69,38 @@ export function InputPanel({ plan, onChange, locale, copy }: Props) {
 
   return (
     <aside className={`input-panel input-mode-${mode}`}>
+      {/* One-Click Preset Personas Bar */}
+      <div className="m3-card preset-personas-card" style={{ marginBottom: 12, padding: '12px 14px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#475569', letterSpacing: '0.04em' }}>
+            {locale === 'ja' ? '⚡ 1秒で人生プロファイルを一括ロード' : '⚡ 一键装载经典人生画像模版'}
+          </span>
+          <span className="m3-chip primary" style={{ fontSize: 11, padding: '2px 8px' }}>FAST PRESETS</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 6 }}>
+          {templates.map((tpl) => (
+            <button
+              key={tpl.id}
+              type="button"
+              className="m3-chip"
+              onClick={() => onChange(tpl.build())}
+              style={{
+                justifyContent: 'center',
+                padding: '6px 10px',
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: 'pointer',
+                background: '#f8fafc',
+                border: '1px solid #cbd5e1',
+                borderRadius: 8,
+              }}
+            >
+              {tpl.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="input-mode-switch" role="group" aria-label={copy.inputMode}>
         <button className={mode === 'simple' ? 'active' : ''} type="button" onClick={() => setMode('simple')}><Sparkles />{copy.simple}</button>
         <button className={mode === 'detailed' ? 'active' : ''} type="button" onClick={() => setMode('detailed')}><Settings2 />{copy.detailed}</button>

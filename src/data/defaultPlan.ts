@@ -156,4 +156,28 @@ export const templates = [
       return plan
     },
   },
+  {
+    id: 'fire',
+    name: 'FIRE・早期リタイア型',
+    build: () => {
+      const plan = clonePlan(defaultPlan)
+      plan.assumptions.initialAssets = 30_000_000
+      plan.assumptions.nominalReturn = 0.05
+      plan.assumptions.postRetirementReturn = 0.04
+      plan.assumptions.monthlyNisaContribution = 100_000
+      plan.adults = [
+        { ...plan.adults[0], currentAge: 32, annualSalary: 9_000_000, retireAge: 45, annualPension: 1_200_000 },
+      ]
+      plan.children = []
+      plan.expenses = {
+        housingBeforeRetirement: 1_440_000,
+        housingAfterRetirement: 1_200_000,
+        livingBeforeRetirement: 2_400_000,
+        livingAfterRetirement: 2_160_000,
+        annualTravel: 500_000,
+      }
+      plan.events = []
+      return plan
+    },
+  },
 ] as const
