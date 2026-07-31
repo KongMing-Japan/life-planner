@@ -28,12 +28,13 @@ type Props = {
 
 const chartMargin = { top: 14, right: 18, left: 0, bottom: 4 }
 
-function StoryTooltip({ active, payload, locale, copy }: { active?: boolean; payload?: TooltipPayload[]; locale: Locale; copy: I18nCopy }) {
+function StoryTooltip({ active, payload, locale, copy, reconciliationLabel }: { active?: boolean; payload?: TooltipPayload[]; locale: Locale; copy: I18nCopy; reconciliationLabel: string }) {
   const row = payload?.[0]?.payload
   if (!active || !row) return null
   return <div className="chart-tooltip gf-tooltip m3-tooltip">
     <div className="gf-tooltip-header">
       <strong>{row.year}{copy.year} · {row.primaryAge}{copy.age}</strong>
+      <span className="m3-chip info">{reconciliationLabel}</span>
       {row.eventNames.length ? <span className="m3-chip success">{row.eventNames.join(' · ')}</span> : null}
     </div>
     <div className="gf-tooltip-body">
@@ -157,7 +158,10 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
     {/* Material 3 Hero Metric Header */}
     <div className="m3-hero-header">
       <div className="m3-hero-title-group">
-        <span className="m3-chip primary">LIFEOS PLANNER</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span className="m3-chip primary">LIFEOS PLANNER</span>
+          <span className="m3-chip info" style={{ fontSize: 11 }}>{labels.reconciliation}</span>
+        </div>
         <h2>{copy.assetsTitle}</h2>
       </div>
       <div className="m3-hero-price-group">
@@ -225,8 +229,8 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
       </div>
     </div>
 
-    {/* Chart Render Canvas */}
-    <div className="story-chart gf-chart-container" aria-label={`${copy.assetsTitle} · ${copy.cashflowTitle}`}>
+    {/* Recharts Render View */}
+    <div className="story-chart gf-chart-container" style={{ marginBottom: 0 }} aria-label={`${copy.assetsTitle} · ${copy.cashflowTitle}`}>
       {activeTab === 'assets' && (
         <div className="story-assets-chart gf-main-chart-view">
           <ResponsiveContainer width="100%" height="100%">
@@ -244,7 +248,7 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
               <CartesianGrid stroke="#e0e4ec" vertical={false} strokeDasharray="3 3" />
               <XAxis dataKey="primaryAge" tickLine={false} axisLine={false} minTickGap={24} tickFormatter={ageTick} tick={{ fill: '#444746', fontSize: 11 }} />
               <YAxis tickLine={false} axisLine={false} width={64} tickFormatter={moneyTick} tick={{ fill: '#444746', fontSize: 11 }} />
-              <Tooltip content={<StoryTooltip locale={locale} copy={copy} />} />
+              <Tooltip content={<StoryTooltip locale={locale} copy={copy} reconciliationLabel={labels.reconciliation} />} />
               <ReferenceLine y={0} stroke="#c4c7c5" strokeWidth={1.5} />
               <ReferenceLine x={selected.primaryAge} stroke="#0b57d0" strokeDasharray="4 4" strokeWidth={1.5} />
               <Area type="monotone" dataKey="assetPositive" stroke="#0b57d0" strokeWidth={2.8} fill="url(#m3AssetBlue)" isAnimationActive={false} />
@@ -265,7 +269,7 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
               <CartesianGrid stroke="#e0e4ec" vertical={false} strokeDasharray="3 3" />
               <XAxis dataKey="primaryAge" tickLine={false} axisLine={false} minTickGap={24} tickFormatter={ageTick} tick={{ fill: '#444746', fontSize: 11 }} />
               <YAxis tickLine={false} axisLine={false} width={64} tickFormatter={moneyTick} tick={{ fill: '#444746', fontSize: 11 }} />
-              <Tooltip content={<StoryTooltip locale={locale} copy={copy} />} />
+              <Tooltip content={<StoryTooltip locale={locale} copy={copy} reconciliationLabel={labels.reconciliation} />} />
               <ReferenceLine y={0} stroke="#c4c7c5" strokeWidth={1.5} />
               <ReferenceLine x={selected.primaryAge} stroke="#0b57d0" strokeDasharray="4 4" strokeWidth={1.5} />
               <Bar dataKey="totalIncome" stackId="annual" fill="#0b57d0" maxBarSize={16} radius={[4, 4, 0, 0]} isAnimationActive={false} />
@@ -289,7 +293,7 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
               <CartesianGrid stroke="#e0e4ec" vertical={false} strokeDasharray="3 3" />
               <XAxis dataKey="primaryAge" tickLine={false} axisLine={false} minTickGap={24} tickFormatter={ageTick} tick={{ fill: '#444746', fontSize: 11 }} />
               <YAxis tickLine={false} axisLine={false} width={64} tickFormatter={moneyTick} tick={{ fill: '#444746', fontSize: 11 }} />
-              <Tooltip content={<StoryTooltip locale={locale} copy={copy} />} />
+              <Tooltip content={<StoryTooltip locale={locale} copy={copy} reconciliationLabel={labels.reconciliation} />} />
               <ReferenceLine y={0} stroke="#c4c7c5" strokeWidth={1.5} />
               <ReferenceLine x={selected.primaryAge} stroke="#0b57d0" strokeDasharray="4 4" strokeWidth={1.5} />
               <Area type="monotone" dataKey="endAssets" stroke="#146c2e" strokeWidth={2.8} fill="url(#m3GainsGreen)" isAnimationActive={false} />
@@ -298,28 +302,6 @@ export function FinancialStoryChart({ projection, locale, copy }: Props) {
           </ResponsiveContainer>
         </div>
       )}
-    </div>
-
-    {/* Waterfall Reconciliation Footer */}
-    <div className="story-waterfall-head gf-waterfall-head">
-      <strong>{labels.reconciliation}</strong>
-      <span>{selected.year}{copy.year} · {selected.primaryAge}{copy.age} · {labels.rounding}</span>
-    </div>
-    <div className="story-waterfall gf-waterfall" aria-live="polite">
-      {waterfall.map((step) => {
-        const left = position(Math.min(step.from, step.to))
-        const right = position(Math.max(step.from, step.to))
-        const style: WaterfallStyle = {
-          '--wf-left': `${left}%`,
-          '--wf-width': `${Math.max(0.4, right - left)}%`,
-          '--wf-zero': `${zeroPosition}%`,
-        }
-        return <div className="story-waterfall-row" key={step.label}>
-          <span>{step.label}</span>
-          <div className="story-waterfall-track" style={style}><i className={`story-waterfall-bar ${step.tone}`} /></div>
-          <strong className={step.value < 0 ? 'negative' : ''}>{formatMoney(step.value, locale)}</strong>
-        </div>
-      })}
     </div>
   </article>
 }

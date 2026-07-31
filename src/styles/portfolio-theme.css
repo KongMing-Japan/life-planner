@@ -184,14 +184,21 @@ a:focus-visible {
 .lifeos-next-steps,
 .tool-section,
 .fp-advice-card {
-  border: 1px solid #dadce0;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: none;
+  border: 1px solid var(--m3-border, #e0e4ec);
+  border-radius: var(--m3-card-radius, 16px);
+  background: var(--m3-surface, #ffffff);
+  box-shadow: var(--m3-shadow, 0 2px 12px rgba(15, 23, 42, 0.04));
+  transition: box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.quick-input-card:hover,
+.input-section:hover,
+.fp-advice-card:hover {
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
 }
 
 .quick-input-card {
-  padding: 18px 16px;
+  padding: 20px;
 }
 
 .quick-input-head span,
