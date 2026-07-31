@@ -803,4 +803,41 @@ body {
 .m3-table td.negative { color: var(--m3-on-danger-container); font-weight: 600; }
 .m3-table td.strong { font-weight: 700; }
 
+/* Executive Quicken Glassmorphic & Glowing Range Slider System */
+.quicken-what-if-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.quicken-slider-group {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.quicken-slider-group:hover {
+  border-color: #38bdf8;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
+}
+
+.quicken-slider-group input[type="range"] {
+  accent-color: #0284c7;
+  height: 6px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.preset-personas-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+}
+
+
 

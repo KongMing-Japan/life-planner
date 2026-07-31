@@ -53,7 +53,7 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
     <div className="m3-card dashboard-head gf-dashboard-head">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <span className="m3-chip primary">EXECUTIVE FINANCIAL WORKSPACE</span>
+          <span className="m3-chip primary" style={{ background: '#0284c7', color: '#ffffff', fontWeight: 700 }}>QUICKEN LIFETIME PLANNER</span>
           <h1 style={{ marginTop: 8, marginBottom: 4, fontSize: 28, fontWeight: 700 }}>{copy.dashboard}</h1>
           <p style={{ margin: 0, color: '#5e5e5e', fontSize: 13 }}>
             {copy.dashboardSubtitle} · {copy.realReturn} {formatPercent(output.summary.realReturn)}
