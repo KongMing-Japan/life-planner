@@ -138,7 +138,7 @@ button { color: inherit; }
 button, summary { -webkit-tap-highlight-color: transparent; }
 button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid rgba(10, 107, 242, .45); outline-offset: 2px; }
 
-.app-shell { width: min(100% - 2rem, 1280px); margin: 0 auto; padding: 1.25rem 0 2.5rem; }
+.app-shell { width: min(100% - 2rem, 1140px); margin: 0 auto; padding: 1.25rem 0 2.5rem; }
 .lifeos-eyebrow-nav { display: inline-flex; align-items: center; gap: .45rem; margin-bottom: .35rem; }
 .lifeos-eyebrow-brand { display: inline-flex; align-items: center; gap: .32rem; color: #1a73e8; font-size: .65rem; font-weight: 750; letter-spacing: .01em; text-decoration: none; opacity: .85; transition: opacity 180ms ease; }
 .lifeos-eyebrow-brand:hover { opacity: 1; }
@@ -254,7 +254,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .tools-button:hover { background: var(--blue-700); }
 .tools-button svg { width: .9rem; height: .9rem; }
 
-.planner-layout { display: grid; grid-template-columns: 380px minmax(0, 1fr); grid-template-areas: 'inputs dashboard'; align-items: start; gap: 1.5rem; padding: 1.25rem 0; }
+.planner-layout { display: grid; grid-template-columns: 350px minmax(0, 1fr); grid-template-areas: 'inputs dashboard'; align-items: start; gap: 1.25rem; padding: 1.25rem 0; }
 .input-panel { grid-area: inputs; display: grid; gap: 1rem; min-width: 0; }
 .dashboard-stack { grid-area: dashboard; display: grid; min-width: 0; gap: 1.25rem; }
 

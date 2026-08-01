@@ -58,7 +58,7 @@ a:focus-visible {
 }
 
 .app-shell {
-  width: min(100% - 2rem, 1280px);
+  width: min(100% - 2rem, 1140px);
   margin: 0 auto;
   padding-top: 16px;
   padding-bottom: 40px;
