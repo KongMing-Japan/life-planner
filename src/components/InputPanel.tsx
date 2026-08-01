@@ -57,27 +57,40 @@ export function InputPanel({ plan, onChange, locale, copy }: Props) {
 
   return (
     <aside className="input-panel">
-      {/* One-Click Preset Personas Bar */}
-      <div className="m3-card preset-personas-card" style={{ marginBottom: 12, padding: '12px 14px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#475569', letterSpacing: '0.04em' }}>
-            {locale === 'ja' ? '⚡ 1秒で人生プロファイルを一括ロード' : '⚡ 一键装载经典人生画像模版'}
+      {/* Notion-style Preset Persona Selection Card */}
+      <div className="m3-card preset-personas-card p-3.5 mb-3 bg-slate-50/50 border border-slate-200 rounded-xl">
+        <div className="flex items-center justify-between mb-2.5">
+          <span className="text-xs font-bold text-slate-700 tracking-wide flex items-center gap-1.5">
+            <span>⚡</span>
+            <span>{locale === 'ja' ? '人生プロファイル模版' : '经典人生画像模版'}</span>
           </span>
-          <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">FAST PRESETS</Badge>
+          <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">PERSONAS</Badge>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 6 }}>
-          {templates.map((tpl) => (
-            <Button
-              key={tpl.id}
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onChange(tpl.build())}
-              className="h-8 text-xs font-medium justify-center"
-            >
-              {tpl.name}
-            </Button>
-          ))}
+        <div className="grid grid-cols-2 gap-2">
+          {templates.map((tpl) => {
+            const name = locale === 'zh' ? tpl.nameZh : tpl.nameJa
+            const tagLine = locale === 'zh' ? tpl.tagLineZh : tpl.tagLineJa
+            return (
+              <button
+                key={tpl.id}
+                type="button"
+                onClick={() => onChange(tpl.build())}
+                className="group flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white hover:bg-sky-50/80 hover:border-sky-300 transition-all text-left shadow-xs cursor-pointer"
+              >
+                <span className="text-xl leading-none select-none group-hover:scale-110 transition-transform">
+                  {tpl.avatar}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-bold text-slate-800 group-hover:text-sky-700 truncate">
+                    {name}
+                  </div>
+                  <div className="text-[10px] text-slate-500 truncate leading-tight mt-0.5">
+                    {tagLine}
+                  </div>
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
 

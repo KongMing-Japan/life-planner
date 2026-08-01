@@ -21,9 +21,9 @@ describe('single-page planner interactions', () => {
     render(<App />)
     const fab = screen.getByTitle('AI Assistant')
     await user.click(fab)
-    const tplButtons = screen.getAllByText('単身・堅実型')
+    const tplButtons = screen.getAllByText(/単身・着実形成/)
     await user.click(tplButtons[tplButtons.length - 1])
-    expect(screen.getByText('「単身・堅実型」のテンプレートを適用しました。データが更新されました。')).toBeInTheDocument()
+    expect(screen.getByText(/「👱‍♂️ 単身・着実形成」のテンプレートを適用しました/)).toBeInTheDocument()
   })
 
   it('starts with the structured Quicken inputs and shows the interactive financial story', async () => {

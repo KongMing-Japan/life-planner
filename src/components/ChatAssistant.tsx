@@ -28,14 +28,8 @@ export function ChatAssistant({ plan, locale, copy, onChange }: Props) {
   const [loading, setLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const getTemplateDisplayName = (id: string, defaultName: string) => {
-    if (locale === 'zh') {
-      if (id === 'standard') return '普通工薪家庭'
-      if (id === 'family') return '双职工家庭'
-      if (id === 'single') return '单身稳健家庭'
-      if (id === 'homemaker') return '家庭主妇家庭'
-    }
-    return defaultName
+  const getTemplateDisplayName = (t: typeof templates[number]) => {
+    return locale === 'zh' ? `${t.avatar} ${t.nameZh}` : `${t.avatar} ${t.nameJa}`
   }
 
   const handleApplyTemplate = (templateId: string) => {
@@ -45,15 +39,16 @@ export function ChatAssistant({ plan, locale, copy, onChange }: Props) {
     const nextPlan = template.build()
     onChange(nextPlan)
 
+    const displayName = getTemplateDisplayName(template)
     const userText =
       locale === 'zh'
-        ? `加载模板：${getTemplateDisplayName(template.id, template.name)}`
-        : `テンプレートを適用：${template.name}`
+        ? `加载模板：${displayName}`
+        : `テンプレートを適用：${displayName}`
 
     const assistantText =
       locale === 'zh'
-        ? `已为您加载「${getTemplateDisplayName(template.id, template.name)}」的规划模板，数据已在主界面中更新。`
-        : `「${template.name}」のテンプレートを適用しました。データが更新されました。`
+        ? `已为您加载「${displayName}」的规划模板，数据已在主界面中更新。`
+        : `「${displayName}」のテンプレートを適用しました。データが更新されました。`
 
     setHistory((prev) => [
       ...prev,
@@ -364,7 +359,7 @@ Strictly output valid JSON matching the format. Be precise about numbers, curren
                 style={{ borderColor: 'var(--blue-600)', background: 'var(--blue-50)', color: 'var(--blue-700)', fontWeight: 650 }}
                 onClick={() => handleApplyTemplate(t.id)}
               >
-                {getTemplateDisplayName(t.id, t.name)}
+                {getTemplateDisplayName(t)}
               </button>
             ))}
           </div>
