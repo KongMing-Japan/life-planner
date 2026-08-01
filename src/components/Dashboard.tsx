@@ -6,6 +6,7 @@ import type { PlannerV2, PlanOutput } from '../types'
 import { FinancialStoryChart } from './FinancialStoryChart'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
 
 type Props = {
   output: PlanOutput
@@ -51,67 +52,95 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
     return Array.from(map.values()).sort((a, b) => a.year - b.year)
   }, [output.projection, peakRow])
 
-  return <section className="dashboard-stack gf-dashboard-stack">
-    {/* Dashboard Executive Header Card */}
-    <div className="m3-card dashboard-head gf-dashboard-head">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
-        <div>
-          <Badge className="bg-sky-600 hover:bg-sky-700 text-white font-bold uppercase tracking-wider text-xs px-3 py-1">
-            QUICKEN LIFETIME PLANNER
-          </Badge>
-          <h1 style={{ marginTop: 8, marginBottom: 4, fontSize: 28, fontWeight: 700 }}>{copy.dashboard}</h1>
-          <p style={{ margin: 0, color: '#5e5e5e', fontSize: 13 }}>
-            {copy.dashboardSubtitle} · {copy.realReturn} {formatPercent(output.summary.realReturn)}
-          </p>
-        </div>
-        <Badge variant={statusClass as any} className="px-4 py-1.5 text-sm font-bold shadow-sm">
-          {statusLabel(output.summary.status, copy)}
+  return <section className="dashboard-stack flex flex-col gap-5">
+    {/* Executive Header Card */}
+    <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 text-white p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <Badge className="bg-sky-500/20 text-sky-300 border border-sky-400/30 font-bold uppercase tracking-wider text-[11px] px-2.5 py-0.5 mb-2">
+          QUICKEN LIFETIME PLANNER
         </Badge>
+        <h1 className="text-2xl font-black tracking-tight text-white m-0 mb-1">{copy.dashboard}</h1>
+        <p className="text-xs text-slate-300 m-0">
+          {copy.dashboardSubtitle} · <span className="text-sky-300 font-semibold">{copy.realReturn} {formatPercent(output.summary.realReturn)}</span>
+        </p>
       </div>
+      <Badge variant={statusClass as any} className="self-start sm:self-auto px-4 py-1.5 text-xs font-bold shadow-xs">
+        {statusLabel(output.summary.status, copy)}
+      </Badge>
     </div>
 
-    {/* Material 3 High-Level Financial Stat Cards Grid */}
-    <div className="m3-stat-grid gf-kpi-grid">
-      <article className="m3-stat-card kpi-card gf-kpi-card">
-        <span><WalletCards />{output.summary.terminalAge}{copy.balanceAt}</span>
-        <strong>{formatMoney(output.summary.terminalAssets, locale)}</strong>
-        <small>{output.summary.terminalYear}{copy.year} {copy.yearEnd}</small>
+    {/* Modern High-Level Financial Stat Cards Grid */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      <article className="rounded-2xl border border-slate-200/80 bg-white p-4.5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
+        <div className="flex items-center justify-between text-xs font-semibold text-slate-500 mb-2">
+          <span className="flex items-center gap-1.5">
+            <span className="p-1 rounded-md bg-sky-50 text-sky-600"><WalletCards className="w-3.5 h-3.5" /></span>
+            <span>{output.summary.terminalAge}{copy.balanceAt}</span>
+          </span>
+        </div>
+        <strong className="text-2xl font-black text-slate-900 tracking-tight">{formatMoney(output.summary.terminalAssets, locale)}</strong>
+        <small className="text-[11px] text-slate-400 font-medium mt-1">{output.summary.terminalYear}{copy.year} {copy.yearEnd}</small>
       </article>
 
       {output.summary.monteCarlo && (
-        <article className="m3-stat-card kpi-card gf-kpi-card">
-          <span><Trophy />{copy.monteCarloSuccess}</span>
-          <strong className={output.summary.monteCarlo.successRate >= 80 ? 'positive' : 'negative'}>
+        <article className="rounded-2xl border border-slate-200/80 bg-white p-4.5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 mb-2">
+            <span className="flex items-center gap-1.5">
+              <span className="p-1 rounded-md bg-emerald-50 text-emerald-600"><Trophy className="w-3.5 h-3.5" /></span>
+              <span>{copy.monteCarloSuccess}</span>
+            </span>
+          </div>
+          <strong className={cn('text-2xl font-black tracking-tight', output.summary.monteCarlo.successRate >= 80 ? 'text-emerald-600' : 'text-rose-600')}>
             {output.summary.monteCarlo.successRate}%
           </strong>
-          <small>{copy.monteCarloTitle}</small>
+          <small className="text-[11px] text-slate-400 font-medium mt-1">{copy.monteCarloTitle}</small>
         </article>
       )}
 
       {peakRow && (
-        <article className="m3-stat-card kpi-card gf-kpi-card">
-          <span><Trophy />{copy.peakAssets}</span>
-          <strong>{formatMoney(peakRow.endAssets, locale)}</strong>
-          <small>{peakRow.year}{copy.year} ({peakRow.primaryAge}{copy.age})</small>
+        <article className="rounded-2xl border border-slate-200/80 bg-white p-4.5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 mb-2">
+            <span className="flex items-center gap-1.5">
+              <span className="p-1 rounded-md bg-amber-50 text-amber-600"><Trophy className="w-3.5 h-3.5" /></span>
+              <span>{copy.peakAssets}</span>
+            </span>
+          </div>
+          <strong className="text-2xl font-black text-slate-900 tracking-tight">{formatMoney(peakRow.endAssets, locale)}</strong>
+          <small className="text-[11px] text-slate-400 font-medium mt-1">{peakRow.year}{copy.year} ({peakRow.primaryAge}{copy.age})</small>
         </article>
       )}
 
-      <article className="m3-stat-card kpi-card gf-kpi-card">
-        <span><Landmark />{copy.requiredReturn}</span>
-        <strong>{requiredReturn === null ? '—' : formatPercent(requiredReturn)}</strong>
-        <small>{requiredReturn === null ? copy.notAchievable : `${copy.currentAssumption} ${formatPercent(output.summary.assumedNominalReturn)}`}</small>
+      <article className="rounded-2xl border border-slate-200/80 bg-white p-4.5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
+        <div className="flex items-center justify-between text-xs font-semibold text-slate-500 mb-2">
+          <span className="flex items-center gap-1.5">
+            <span className="p-1 rounded-md bg-indigo-50 text-indigo-600"><Landmark className="w-3.5 h-3.5" /></span>
+            <span>{copy.requiredReturn}</span>
+          </span>
+        </div>
+        <strong className="text-2xl font-black text-slate-900 tracking-tight">{requiredReturn === null ? '—' : formatPercent(requiredReturn)}</strong>
+        <small className="text-[11px] text-slate-400 font-medium mt-1">{requiredReturn === null ? copy.notAchievable : `${copy.currentAssumption} ${formatPercent(output.summary.assumedNominalReturn)}`}</small>
       </article>
 
-      <article className="m3-stat-card kpi-card gf-kpi-card">
-        <span><CalendarClock />{copy.firstShortfall}</span>
-        <strong>{output.summary.firstNegativeYear ? `${output.summary.firstNegativeAge}${copy.age}` : copy.notOccurred}</strong>
-        <small>{output.summary.firstNegativeYear ? `${output.summary.firstNegativeYear}${copy.year}` : copy.staysPositive}</small>
+      <article className="rounded-2xl border border-slate-200/80 bg-white p-4.5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
+        <div className="flex items-center justify-between text-xs font-semibold text-slate-500 mb-2">
+          <span className="flex items-center gap-1.5">
+            <span className="p-1 rounded-md bg-rose-50 text-rose-600"><CalendarClock className="w-3.5 h-3.5" /></span>
+            <span>{copy.firstShortfall}</span>
+          </span>
+        </div>
+        <strong className="text-2xl font-black text-slate-900 tracking-tight">{output.summary.firstNegativeYear ? `${output.summary.firstNegativeAge}${copy.age}` : copy.notOccurred}</strong>
+        <small className="text-[11px] text-slate-400 font-medium mt-1">{output.summary.firstNegativeYear ? `${output.summary.firstNegativeYear}${copy.year}` : copy.staysPositive}</small>
       </article>
 
-      <article className="m3-stat-card kpi-card gf-kpi-card">
-        <span><TrendingDown />{copy.retirementAdjustment}</span>
-        <strong>{spendingAdjustment === null ? '—' : formatMoney(Math.abs(spendingAdjustment), locale)}</strong>
-        <small>{spendingNote}</small>
+      <article className="rounded-2xl border border-slate-200/80 bg-white p-4.5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
+        <div className="flex items-center justify-between text-xs font-semibold text-slate-500 mb-2">
+          <span className="flex items-center gap-1.5">
+            <span className="p-1 rounded-md bg-blue-50 text-blue-600"><TrendingDown className="w-3.5 h-3.5" /></span>
+            <span>{copy.retirementAdjustment}</span>
+          </span>
+        </div>
+        <strong className="text-2xl font-black text-slate-900 tracking-tight">{spendingAdjustment === null ? '—' : formatMoney(Math.abs(spendingAdjustment), locale)}</strong>
+        <small className="text-[11px] text-slate-400 font-medium mt-1">{spendingNote}</small>
       </article>
     </div>
 
