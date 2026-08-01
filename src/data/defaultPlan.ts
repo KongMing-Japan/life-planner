@@ -100,6 +100,7 @@ export const clonePlan = (plan: PlannerV2): PlannerV2 =>
 export type PresetTemplate = {
   id: string
   avatar: string
+  image: string
   nameJa: string
   nameZh: string
   tagLineJa: string
@@ -113,6 +114,7 @@ export const templates: readonly PresetTemplate[] = [
   {
     id: 'standard',
     avatar: '👨‍👩‍👧‍👦',
+    image: '/personas/family_four.jpg',
     nameJa: '共働き4人家族',
     nameZh: '双职工 4人家庭',
     tagLineJa: '世帯年収1300万・子ども2人',
@@ -124,6 +126,7 @@ export const templates: readonly PresetTemplate[] = [
   {
     id: 'single',
     avatar: '👱‍♂️',
+    image: '/personas/single_pro.jpg',
     nameJa: '単身・着実形成',
     nameZh: '单身 稳健形成',
     tagLineJa: '30代独身・年収650万',
@@ -153,6 +156,7 @@ export const templates: readonly PresetTemplate[] = [
   {
     id: 'single_parent',
     avatar: '👨‍👩‍👧',
+    image: '/personas/single_parent.jpg',
     nameJa: 'ひとり親家庭',
     nameZh: '单亲家庭',
     tagLineJa: '30代ひとり親・子ども1人',
@@ -185,6 +189,7 @@ export const templates: readonly PresetTemplate[] = [
   {
     id: 'homemaker',
     avatar: '👔',
+    image: '/personas/homemaker.jpg',
     nameJa: '片働き・専業主婦',
     nameZh: '单收入 家庭主妇',
     tagLineJa: '年収850万・専業主婦・子ども2人',
@@ -209,6 +214,7 @@ export const templates: readonly PresetTemplate[] = [
   {
     id: 'empty_nester',
     avatar: '👵👴',
+    image: '/personas/senior_couple.jpg',
     nameJa: '50代・熟年夫婦',
     nameZh: '50代 熟年夫妻',
     tagLineJa: '子ども独立・50代・貯蓄2500万',
@@ -245,6 +251,7 @@ export const templates: readonly PresetTemplate[] = [
   {
     id: 'fire',
     avatar: '🚀',
+    image: '/personas/fire_retire.jpg',
     nameJa: 'FIRE・早期リタイア',
     nameZh: 'FIRE 早期退休',
     tagLineJa: '30代・45歳リタイア目標',

@@ -75,11 +75,13 @@ export function InputPanel({ plan, onChange, locale, copy }: Props) {
                 key={tpl.id}
                 type="button"
                 onClick={() => onChange(tpl.build())}
-                className="group flex items-start gap-2 p-2 rounded-lg border border-slate-200 bg-white hover:bg-sky-50/80 hover:border-sky-300 transition-all text-left shadow-xs cursor-pointer"
+                className="group flex items-center gap-2.5 p-2 rounded-xl border border-slate-200/80 bg-white hover:bg-sky-50/70 hover:border-sky-300 transition-all text-left shadow-2xs cursor-pointer"
               >
-                <span className="text-xl leading-none select-none group-hover:scale-110 transition-transform">
-                  {tpl.avatar}
-                </span>
+                <img
+                  src={tpl.image}
+                  alt={name}
+                  className="w-9 h-9 rounded-full border border-slate-200/70 object-cover shadow-2xs group-hover:scale-105 transition-transform flex-shrink-0"
+                />
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-bold text-slate-800 group-hover:text-sky-700 truncate">
                     {name}
