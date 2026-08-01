@@ -1,4 +1,6 @@
 import { type InputHTMLAttributes, type ReactNode, useEffect, useState } from 'react'
+import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 
 type NumberFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'type'> & {
   label: string
@@ -9,7 +11,7 @@ type NumberFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'o
   scale?: number
 }
 
-export function NumberField({ label, value, onChange, suffix, hint, scale = 1, min, max, step, ...props }: NumberFieldProps) {
+export function NumberField({ label, value, onChange, suffix, hint, scale = 1, min, max, step, className, ...props }: NumberFieldProps) {
   const scaledValue = Number.isFinite(value) ? value / scale : 0
   const [inputValue, setInputValue] = useState<string>(scaledValue.toString())
 
@@ -31,10 +33,10 @@ export function NumberField({ label, value, onChange, suffix, hint, scale = 1, m
   }
 
   return (
-    <label className="field">
+    <label className={cn('field', className)}>
       <span className="field-label">{label}</span>
       <span className="field-control">
-        <input
+        <Input
           {...props}
           type="number"
           min={typeof min === 'number' ? min / scale : min}

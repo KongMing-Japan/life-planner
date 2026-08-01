@@ -3,6 +3,9 @@ import { useState } from 'react'
 import type { I18nCopy, Locale } from '../i18n'
 import type { Adult, Child, LifeEvent, PlannerV2 } from '../types'
 import { NumberField, SectionHeading } from './Fields'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
 
 import { templates } from '../data/defaultPlan'
 
@@ -60,28 +63,20 @@ export function InputPanel({ plan, onChange, locale, copy }: Props) {
           <span style={{ fontSize: 12, fontWeight: 700, color: '#475569', letterSpacing: '0.04em' }}>
             {locale === 'ja' ? '⚡ 1秒で人生プロファイルを一括ロード' : '⚡ 一键装载经典人生画像模版'}
           </span>
-          <span className="m3-chip primary" style={{ fontSize: 11, padding: '2px 8px' }}>FAST PRESETS</span>
+          <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider">FAST PRESETS</Badge>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 6 }}>
           {templates.map((tpl) => (
-            <button
+            <Button
               key={tpl.id}
               type="button"
-              className="m3-chip"
+              variant="outline"
+              size="sm"
               onClick={() => onChange(tpl.build())}
-              style={{
-                justifyContent: 'center',
-                padding: '6px 10px',
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: 'pointer',
-                background: '#f8fafc',
-                border: '1px solid #cbd5e1',
-                borderRadius: 8,
-              }}
+              className="h-8 text-xs font-medium justify-center"
             >
               {tpl.name}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -170,25 +165,22 @@ export function InputPanel({ plan, onChange, locale, copy }: Props) {
               <NumberField label={copy.travel} value={plan.expenses.annualTravel} min={0} step={100_000} scale={10_000} suffix={copy.moneyUnit} onChange={(value) => onChange({ ...plan, expenses: { ...plan.expenses, annualTravel: value } })} />
             </div>
           </section>
-        </div>
 
-      {/* Quicken Step 06 & 07: Special Events & Loans */}
-      <details className="input-section events-section" open style={{ marginTop: 16 }}>
-        <summary><CalendarDays /><span>{copy.events}</span><b>{plan.events.length}</b></summary>
-        <div className="input-section-body">
-          <SectionHeading icon={<CalendarDays />} title={locale === 'ja' ? '06. 特別イベント・大型支出 (Special Events & Loans)' : '06. 重大事件与按揭借款 (Special Events & Loans)'} />
-          <p className="section-help">{copy.eventHelp}</p>
-          <div className="event-stack">
-            {plan.events.map((event) => <article className={`event-editor ${event.type}`} key={event.id}>
-              <div className="event-editor-head"><div className="event-type-toggle"><button className={event.type === 'expense' ? 'active' : ''} type="button" onClick={() => updateEvent(event.id, { type: 'expense', taxable: false })}>{copy.expense}</button><button className={event.type === 'income' ? 'active' : ''} type="button" onClick={() => updateEvent(event.id, { type: 'income' })}>{copy.income}</button></div><button aria-label={`${copy.delete} ${event.name}`} type="button" onClick={() => onChange({ ...plan, events: plan.events.filter((item) => item.id !== event.id) })}><Trash2 /></button></div>
-              <label className="event-name"><span>{copy.eventName}</span><input value={event.name} onChange={(e) => updateEvent(event.id, { name: e.target.value })} /></label>
-              <div className="event-fields"><NumberField label={copy.eventStart} value={event.startYear} min={plan.assumptions.startYear} max={plan.assumptions.startYear + 120} onChange={(startYear) => updateEvent(event.id, { startYear })} /><NumberField label={copy.duration} value={event.duration} min={1} max={100} suffix={copy.year} onChange={(duration) => updateEvent(event.id, { duration })} /><NumberField label={copy.annualAmount} value={event.annualAmount} min={0} step={100_000} scale={10_000} suffix={copy.moneyUnit} onChange={(annualAmount) => updateEvent(event.id, { annualAmount })} /></div>
-              <div className="event-meta"><label><span>{copy.relatedMember}</span><select value={event.memberId ?? ''} onChange={(e) => updateEvent(event.id, { memberId: e.target.value || null })}><option value="">{copy.householdShared}</option>{[...plan.adults, ...plan.children].map((member) => <option value={member.id} key={member.id}>{member.name}</option>)}</select></label>{event.type === 'income' ? <label className="check-field"><input type="checkbox" checked={event.taxable} onChange={(e) => updateEvent(event.id, { taxable: e.target.checked })} /><span>{copy.taxable}</span></label> : null}</div>
-            </article>)}
-          </div>
-          <button className="add-event-button" type="button" onClick={addEvent} style={{ marginTop: 10 }}><Plus />{copy.addEvent}</button>
+          {/* Quicken Step 06: Special Events & Loans */}
+          <section style={{ borderTop: '1px solid #e0e4ec', paddingTop: 16 }}>
+            <SectionHeading icon={<CalendarDays />} title={locale === 'ja' ? '06. 特別イベント・大型支出 (Special Events & Loans)' : '06. 重大事件与按揭借款 (Special Events & Loans)'} />
+            <p className="section-help">{copy.eventHelp}</p>
+            <div className="event-stack">
+              {plan.events.map((event) => <article className={`event-editor ${event.type}`} key={event.id}>
+                <div className="event-editor-head"><div className="event-type-toggle"><button className={event.type === 'expense' ? 'active' : ''} type="button" onClick={() => updateEvent(event.id, { type: 'expense', taxable: false })}>{copy.expense}</button><button className={event.type === 'income' ? 'active' : ''} type="button" onClick={() => updateEvent(event.id, { type: 'income' })}>{copy.income}</button></div><button aria-label={`${copy.delete} ${event.name}`} type="button" onClick={() => onChange({ ...plan, events: plan.events.filter((item) => item.id !== event.id) })}><Trash2 /></button></div>
+                <label className="event-name"><span>{copy.eventName}</span><input value={event.name} onChange={(e) => updateEvent(event.id, { name: e.target.value })} /></label>
+                <div className="event-fields"><NumberField label={copy.eventStart} value={event.startYear} min={plan.assumptions.startYear} max={plan.assumptions.startYear + 120} onChange={(startYear) => updateEvent(event.id, { startYear })} /><NumberField label={copy.duration} value={event.duration} min={1} max={100} suffix={copy.year} onChange={(duration) => updateEvent(event.id, { duration })} /><NumberField label={copy.annualAmount} value={event.annualAmount} min={0} step={100_000} scale={10_000} suffix={copy.moneyUnit} onChange={(annualAmount) => updateEvent(event.id, { annualAmount })} /></div>
+                <div className="event-meta"><label><span>{copy.relatedMember}</span><select value={event.memberId ?? ''} onChange={(e) => updateEvent(event.id, { memberId: e.target.value || null })}><option value="">{copy.householdShared}</option>{[...plan.adults, ...plan.children].map((member) => <option value={member.id} key={member.id}>{member.name}</option>)}</select></label>{event.type === 'income' ? <label className="check-field"><input type="checkbox" checked={event.taxable} onChange={(e) => updateEvent(event.id, { taxable: e.target.checked })} /><span>{copy.taxable}</span></label> : null}</div>
+              </article>)}
+            </div>
+            <button className="add-event-button" type="button" onClick={addEvent} style={{ marginTop: 10 }}><Plus />{copy.addEvent}</button>
+          </section>
         </div>
-      </details>
     </aside>
   )
 }

@@ -1,6 +1,8 @@
 import { ChevronDown, Languages } from 'lucide-react'
 import { useRef } from 'react'
 import { locales, type Locale } from '../i18n'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 type LanguageSwitcherProps = {
   locale: Locale
@@ -29,19 +31,20 @@ export function LanguageSwitcher({ locale, onLocaleChange }: LanguageSwitcherPro
       </summary>
 
       <div className="language-menu">
-        <div>
+        <div className="flex flex-col gap-1 p-1">
           {locales.map((item) => {
             const isActive = locale === item.id
             return (
-              <button
-                type="button"
+              <Button
+                variant={isActive ? 'secondary' : 'ghost'}
+                size="sm"
                 key={item.id}
                 onClick={() => handleSelect(item.id)}
-                className={isActive ? 'is-active' : ''}
+                className={cn('justify-start text-xs w-full', isActive && 'is-active font-semibold')}
                 aria-current={isActive ? 'page' : undefined}
               >
                 {item.label}
-              </button>
+              </Button>
             )
           })}
         </div>

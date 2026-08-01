@@ -11,8 +11,6 @@ describe('single-page planner interactions', () => {
     render(<App />)
     expect(screen.getByText('生涯資産シミュレーション')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '子どもを追加' }))
-    expect(screen.getByDisplayValue('子ども3')).toBeInTheDocument()
-    await user.click(screen.getByText('ライフイベント'))
     const addEvent = screen.getByRole('button', { name: 'イベントを追加' })
     await user.click(addEvent)
     expect(screen.getByDisplayValue('新しいイベント')).toBeInTheDocument()

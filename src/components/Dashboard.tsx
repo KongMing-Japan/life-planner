@@ -4,6 +4,8 @@ import type { I18nCopy, Locale } from '../i18n'
 import { formatMoney, formatPercent, statusLabel } from '../i18n'
 import type { PlannerV2, PlanOutput } from '../types'
 import { FinancialStoryChart } from './FinancialStoryChart'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 type Props = {
   output: PlanOutput
@@ -21,7 +23,7 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
   const primary = plan?.adults.find((adult) => adult.role === 'primary') ?? plan?.adults[0]
   const spouse = plan?.adults.find((adult) => adult.role === 'spouse')
 
-  const statusClass = output.summary.status === '资金不足' ? 'danger' : output.summary.status === '接近 Die with Zero' ? 'success' : 'primary'
+  const statusClass = output.summary.status === '资金不足' ? 'destructive' : output.summary.status === '接近 Die with Zero' ? 'secondary' : 'default'
   const requiredReturn = output.summary.requiredNominalReturn
   const spendingAdjustment = output.summary.retirementSpendingAdjustment
   const spendingNote = spendingAdjustment === null ? copy.notAchievable : spendingAdjustment > 1 ? copy.canSpendMore : spendingAdjustment < -1 ? copy.mustSpendLess : copy.onTarget
@@ -54,15 +56,17 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
     <div className="m3-card dashboard-head gf-dashboard-head">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <span className="m3-chip primary" style={{ background: '#0284c7', color: '#ffffff', fontWeight: 700 }}>QUICKEN LIFETIME PLANNER</span>
+          <Badge className="bg-sky-600 hover:bg-sky-700 text-white font-bold uppercase tracking-wider text-xs px-3 py-1">
+            QUICKEN LIFETIME PLANNER
+          </Badge>
           <h1 style={{ marginTop: 8, marginBottom: 4, fontSize: 28, fontWeight: 700 }}>{copy.dashboard}</h1>
           <p style={{ margin: 0, color: '#5e5e5e', fontSize: 13 }}>
             {copy.dashboardSubtitle} · {copy.realReturn} {formatPercent(output.summary.realReturn)}
           </p>
         </div>
-        <span className={`m3-chip ${statusClass}`} style={{ padding: '6px 16px', fontSize: 13, fontWeight: 700 }}>
+        <Badge variant={statusClass as any} className="px-4 py-1.5 text-sm font-bold shadow-sm">
           {statusLabel(output.summary.status, copy)}
-        </span>
+        </Badge>
       </div>
     </div>
 
@@ -276,28 +280,20 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
       </summary>
 
       <div style={{ marginTop: 12, padding: '0 20px 20px' }}>
-        <div className="gf-table-tab-group m3-tab-group" role="tablist" style={{ marginBottom: 12 }}>
-          <button
-            type="button"
-            className={`m3-tab-button ${activeTableTab === 'ledger' ? 'active' : ''}`}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTableTab('ledger') }}
-          >
-            {copy.tabLedger} ({output.projection.length})
-          </button>
-          <button
-            type="button"
-            className={`m3-tab-button ${activeTableTab === 'events' ? 'active' : ''}`}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTableTab('events') }}
-          >
-            {copy.tabEvents} ({eventRows.length})
-          </button>
-          <button
-            type="button"
-            className={`m3-tab-button ${activeTableTab === 'milestones' ? 'active' : ''}`}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTableTab('milestones') }}
-          >
-            {locale === 'ja' ? 'キーマイルストーン' : '关键里程碑'} ({milestoneRows.length})
-          </button>
+        <div style={{ marginBottom: 12 }}>
+          <Tabs value={activeTableTab} onValueChange={(val) => setActiveTableTab(val as TableTabKey)}>
+            <TabsList className="w-full sm:w-auto grid grid-cols-3 sm:inline-flex">
+              <TabsTrigger value="ledger">
+                {copy.tabLedger} ({output.projection.length})
+              </TabsTrigger>
+              <TabsTrigger value="events">
+                {copy.tabEvents} ({eventRows.length})
+              </TabsTrigger>
+              <TabsTrigger value="milestones">
+                {locale === 'ja' ? 'キーマイルストーン' : '关键里程碑'} ({milestoneRows.length})
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
 
         {/* Tab 1: Lifetime Financial Ledger Table */}

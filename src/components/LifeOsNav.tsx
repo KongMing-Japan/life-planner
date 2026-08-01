@@ -3,44 +3,58 @@ import type { Locale } from '../i18n'
 
 type LifeOsNavProps = {
   locale: Locale
+  portfolioUrl?: string
+  taxUrl?: string
 }
 
-const labels = {
-  ja: { aria: 'LifeOS ツール', planner: 'Planner', portfolio: 'Portfolio', tax: 'Tax' },
-  zh: { aria: 'LifeOS 工具', planner: 'Planner', portfolio: 'Portfolio', tax: 'Tax' },
-} as const
+export function LifeOsNav({
+  locale,
+  portfolioUrl = 'https://portfolio.kongmingjapan.com/',
+  taxUrl,
+}: LifeOsNavProps) {
+  const defaultTaxUrl = `https://tax.kongmingjapan.com/${locale === 'zh' ? 'zh-CN' : 'ja'}/`
+  const resolvedTaxUrl = taxUrl || defaultTaxUrl
 
-export function LifeOsNav({ locale }: LifeOsNavProps) {
-  const text = labels[locale]
   const products = [
-    { id: 'planner', label: text.planner, href: '/', icon: Route },
-    { id: 'portfolio', label: text.portfolio, href: 'https://portfolio.kongmingjapan.com/', icon: Landmark },
-    { id: 'tax', label: text.tax, href: `https://tax.kongmingjapan.com/${locale === 'zh' ? 'zh-CN' : 'ja'}/`, icon: ReceiptText },
+    { id: 'planner', label: 'Planner', href: '/', icon: Route, isActive: true },
+    { id: 'portfolio', label: 'Portfolio', href: portfolioUrl, icon: Landmark, isActive: false },
+    { id: 'tax', label: 'Tax', href: resolvedTaxUrl, icon: ReceiptText, isActive: false },
   ] as const
 
   return (
-    <nav className="lifeos-nav" aria-label={text.aria}>
-      <a className="lifeos-wordmark" href="https://kongmingjapan.com/">
-        <Orbit aria-hidden="true" />
+    <div className="lifeos-eyebrow-nav flex items-center gap-2 mb-1.5">
+      <a
+        className="lifeos-eyebrow-brand flex items-center gap-1.5 text-sky-600 hover:text-sky-700 font-bold text-sm no-underline transition-colors"
+        href="https://kongmingjapan.com/"
+        target="_blank"
+        rel="noreferrer"
+      >
+        <Orbit className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
         <span>LifeOS</span>
       </a>
-      <div className="lifeos-products">
+      <span className="lifeos-eyebrow-divider text-slate-300 font-light select-none">/</span>
+      <nav className="lifeos-eyebrow-menu flex items-center gap-1" aria-label="LifeOS Suite">
         {products.map((product) => {
           const Icon = product.icon
-          const isActive = product.id === 'planner'
           return (
             <a
-              className={isActive ? 'is-active' : undefined}
-              href={product.href}
-              aria-current={isActive ? 'page' : undefined}
               key={product.id}
+              className={`lifeos-menu-item flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md transition-all ${
+                product.isActive
+                  ? 'active bg-sky-50 text-sky-700 font-semibold shadow-xs dark:bg-sky-950 dark:text-sky-300'
+                  : 'text-slate-600 hover:text-sky-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800'
+              }`}
+              href={product.href}
+              target={product.id === 'planner' ? undefined : '_blank'}
+              rel={product.id === 'planner' ? undefined : 'noreferrer'}
+              aria-current={product.isActive ? 'page' : undefined}
             >
-              <Icon aria-hidden="true" />
+              <Icon className="h-3.5 w-3.5" aria-hidden="true" />
               <span>{product.label}</span>
             </a>
           )
         })}
-      </div>
-    </nav>
+      </nav>
+    </div>
   )
 }

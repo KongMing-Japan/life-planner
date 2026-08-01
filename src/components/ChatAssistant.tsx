@@ -4,6 +4,9 @@ import { type ChatMessage, sendMessage } from '../services/groqService'
 import type { I18nCopy, Locale } from '../i18n'
 import { templates } from '../data/defaultPlan'
 import type { PlannerV2 } from '../types'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
 
 type Props = {
   plan: PlannerV2
@@ -390,7 +393,7 @@ Strictly output valid JSON matching the format. Be precise about numbers, curren
             handleSend(input)
           }}
         >
-          <input
+          <Input
             type="text"
             value={input}
             disabled={loading}
@@ -402,13 +405,15 @@ Strictly output valid JSON matching the format. Be precise about numbers, curren
                   : 'Type instructions...'
             }
             onChange={(e) => setInput(e.target.value)}
+            className="flex-1"
           />
-          <button
+          <Button
             type="submit"
+            size="icon"
             disabled={loading || !input.trim()}
           >
-            <Send />
-          </button>
+            <Send className="h-4 w-4" />
+          </Button>
         </form>
       </div>
     </>

@@ -4,6 +4,7 @@ import { InputPanel } from './components/InputPanel'
 import { ChatAssistant } from './components/ChatAssistant'
 import { LifeOsNextSteps } from './components/LifeOsNextSteps'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
+import { LifeOsNav } from './components/LifeOsNav'
 import { buildPlanOutput } from './engine/planner'
 import { getCopy, type Locale } from './i18n'
 import { loadPlan, savePlan } from './storage/plannerStorage'
@@ -92,24 +93,7 @@ export default function App() {
       <header className="app-header">
         <div className="brand-block">
           <div>
-            <div className="lifeos-eyebrow-nav">
-              <a className="lifeos-eyebrow-brand" href="https://kongmingjapan.com/" target="_blank" rel="noreferrer">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
-                <span>LifeOS</span>
-              </a>
-              <span className="lifeos-eyebrow-divider">/</span>
-              <nav className="lifeos-eyebrow-menu" aria-label="LifeOS Suite">
-                <a className="lifeos-menu-item active" href="/" aria-current="page">
-                  Planner
-                </a>
-                <a className="lifeos-menu-item" href={portfolioUrl} target="_blank" rel="noreferrer">
-                  Portfolio
-                </a>
-                <a className="lifeos-menu-item" href={taxUrl} target="_blank" rel="noreferrer">
-                  Tax
-                </a>
-              </nav>
-            </div>
+            <LifeOsNav locale={locale} portfolioUrl={portfolioUrl} taxUrl={taxUrl} />
             <h1>{copy.appTitle}</h1>
             <p>{copy.appSubtitle}</p>
           </div>

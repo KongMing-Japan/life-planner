@@ -1,6 +1,7 @@
 import { ArrowRight, Landmark, ReceiptText } from 'lucide-react'
 import { formatMoney, type Locale } from '../i18n'
 import type { PlannerV2 } from '../types'
+import { Badge } from '@/components/ui/badge'
 
 type LifeOsNextStepsProps = {
   locale: Locale
@@ -43,7 +44,7 @@ export function LifeOsNextSteps({ locale, plan }: LifeOsNextStepsProps) {
     <section className="lifeos-next-steps" aria-labelledby="lifeos-next-title">
       <div className="lifeos-next-heading">
         <div>
-          <span>LifeOS</span>
+          <Badge variant="secondary" className="mb-2 uppercase tracking-wider text-[11px]">LifeOS Ecosystem</Badge>
           <h2 id="lifeos-next-title">{text.title}</h2>
           <p>{text.description}</p>
         </div>
