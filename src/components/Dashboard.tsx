@@ -295,30 +295,30 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
     </article>
 
     {/* Bottom Collapsible Itemized Audit Ledger */}
-    <details className="annual-details gf-details-wrapper m3-table-card bottom-audit-ledger" id="annual-details">
-      <summary className="gf-details-summary m3-table-header" style={{ cursor: 'pointer', padding: '14px 20px' }}>
-        <div className="gf-table-tabs-header" style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <ChevronDown className="summary-chevron" size={18} style={{ transition: 'transform 0.2s ease' }} />
-            <span>{copy.bottomLedgerTitle ?? copy.annualDetails}</span>
+    <details className="group rounded-2xl border border-slate-200/80 bg-white shadow-2xs overflow-hidden transition-all" id="annual-details">
+      <summary className="flex items-center justify-between p-4 cursor-pointer select-none bg-slate-50/50 hover:bg-slate-100/60 transition-colors">
+        <div className="flex items-center gap-2.5">
+          <ChevronDown className="w-4 h-4 text-slate-500 group-open:rotate-180 transition-transform duration-200" />
+          <h2 className="text-sm font-bold text-slate-800 m-0">
+            {copy.bottomLedgerTitle ?? copy.annualDetails}
           </h2>
-          <span className="m3-chip" style={{ fontSize: 12 }}>
-            {locale === 'ja' ? 'クリックして逐年明細を展開 (Audit)' : '点击展开逐年财务明细 (Audit)'}
-          </span>
         </div>
+        <Badge variant="outline" className="text-[11px] font-medium text-slate-500 bg-white">
+          {locale === 'ja' ? 'クリックして展開 (Audit)' : '点击展开财务明细 (Audit)'}
+        </Badge>
       </summary>
 
-      <div style={{ marginTop: 12, padding: '0 20px 20px' }}>
-        <div style={{ marginBottom: 12 }}>
+      <div className="p-4 pt-3 border-t border-slate-100">
+        <div className="mb-4">
           <Tabs value={activeTableTab} onValueChange={(val) => setActiveTableTab(val as TableTabKey)}>
-            <TabsList className="w-full sm:w-auto grid grid-cols-3 sm:inline-flex">
-              <TabsTrigger value="ledger">
+            <TabsList className="w-full sm:w-auto grid grid-cols-3 sm:inline-flex bg-slate-100 p-1 rounded-xl">
+              <TabsTrigger value="ledger" className="text-xs font-semibold">
                 {copy.tabLedger} ({output.projection.length})
               </TabsTrigger>
-              <TabsTrigger value="events">
+              <TabsTrigger value="events" className="text-xs font-semibold">
                 {copy.tabEvents} ({eventRows.length})
               </TabsTrigger>
-              <TabsTrigger value="milestones">
+              <TabsTrigger value="milestones" className="text-xs font-semibold">
                 {locale === 'ja' ? 'キーマイルストーン' : '关键里程碑'} ({milestoneRows.length})
               </TabsTrigger>
             </TabsList>
@@ -327,29 +327,46 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
 
         {/* Tab 1: Lifetime Financial Ledger Table */}
         {activeTableTab === 'ledger' && (
-          <div className="table-scroll gf-table-scroll">
-            <table className="gf-table m3-table">
+          <div className="overflow-x-auto max-h-[440px] rounded-xl border border-slate-200/80">
+            <table className="w-full text-xs text-right border-collapse">
               <thead>
-                <tr>
-                  <th>{copy.yearAge}</th>
-                  <th>{copy.startAssets}</th>
-                  <th>{copy.afterTaxIncome}</th>
-                  <th>{copy.totalExpense}</th>
-                  <th>{copy.investmentGain}</th>
-                  <th>{copy.endAssets}</th>
-                  <th>{copy.eventColumn}</th>
+                <tr className="bg-slate-50/90 text-slate-500 font-bold uppercase tracking-wider text-[11px] border-b border-slate-200/80 sticky top-0 z-10 backdrop-blur-xs">
+                  <th className="py-3 px-3.5 text-left">{copy.yearAge}</th>
+                  <th className="py-3 px-3.5">{copy.startAssets}</th>
+                  <th className="py-3 px-3.5">{copy.afterTaxIncome}</th>
+                  <th className="py-3 px-3.5">{copy.totalExpense}</th>
+                  <th className="py-3 px-3.5">{copy.investmentGain}</th>
+                  <th className="py-3 px-3.5">{copy.endAssets}</th>
+                  <th className="py-3 px-3.5 text-left">{copy.eventColumn}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100 font-mono font-medium text-slate-700">
                 {output.projection.map((row) => (
-                  <tr key={row.year}>
-                    <td><strong>{row.year}</strong><small>{row.primaryAge}{copy.age}</small></td>
-                    <td>{formatMoney(row.startAssets, locale)}</td>
-                    <td>{formatMoney(row.totalIncome, locale)}</td>
-                    <td>{formatMoney(row.totalExpense, locale)}</td>
-                    <td className={row.investmentGain < 0 ? 'negative' : 'positive'}>{formatMoney(row.investmentGain, locale)}</td>
-                    <td className={row.endAssets < 0 ? 'negative strong' : 'strong'}>{formatMoney(row.endAssets, locale)}</td>
-                    <td>{row.eventNames.join('、') || copy.noEvent}</td>
+                  <tr key={row.year} className="hover:bg-slate-50/70 transition-colors">
+                    <td className="py-2.5 px-3.5 text-left font-sans">
+                      <strong className="text-slate-900 font-bold">{row.year}</strong>
+                      <span className="text-[10px] text-slate-400 block">{row.primaryAge}{copy.age}</span>
+                    </td>
+                    <td className="py-2.5 px-3.5">{formatMoney(row.startAssets, locale)}</td>
+                    <td className="py-2.5 px-3.5">{formatMoney(row.totalIncome, locale)}</td>
+                    <td className="py-2.5 px-3.5">{formatMoney(row.totalExpense, locale)}</td>
+                    <td className={cn('py-2.5 px-3.5', row.investmentGain < 0 ? 'text-rose-600 font-bold' : 'text-emerald-600 font-semibold')}>
+                      {formatMoney(row.investmentGain, locale)}
+                    </td>
+                    <td className={cn('py-2.5 px-3.5 font-bold', row.endAssets < 0 ? 'text-rose-600' : 'text-slate-900')}>
+                      {formatMoney(row.endAssets, locale)}
+                    </td>
+                    <td className="py-2.5 px-3.5 text-left font-sans text-slate-500">
+                      {row.eventNames.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {row.eventNames.map((evt) => (
+                            <Badge key={evt} variant="secondary" className="text-[10px] font-normal bg-sky-50 text-sky-700 border border-sky-100">
+                              {evt}
+                            </Badge>
+                          ))}
+                        </div>
+                      ) : '—'}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -359,33 +376,44 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
 
         {/* Tab 2: Life Events Impact Table */}
         {activeTableTab === 'events' && (
-          <div className="table-scroll gf-table-scroll">
-            <table className="gf-table m3-table">
+          <div className="overflow-x-auto max-h-[440px] rounded-xl border border-slate-200/80">
+            <table className="w-full text-xs text-right border-collapse">
               <thead>
-                <tr>
-                  <th>{copy.yearAge}</th>
-                  <th>{copy.eventColumn}</th>
-                  <th>{copy.afterTaxIncome}</th>
-                  <th>{copy.totalExpense}</th>
-                  <th>{copy.netCashflow}</th>
-                  <th>{copy.endAssets}</th>
+                <tr className="bg-slate-50/90 text-slate-500 font-bold uppercase tracking-wider text-[11px] border-b border-slate-200/80 sticky top-0 z-10 backdrop-blur-xs">
+                  <th className="py-3 px-3.5 text-left">{copy.yearAge}</th>
+                  <th className="py-3 px-3.5 text-left">{copy.eventColumn}</th>
+                  <th className="py-3 px-3.5">{copy.afterTaxIncome}</th>
+                  <th className="py-3 px-3.5">{copy.totalExpense}</th>
+                  <th className="py-3 px-3.5">{copy.netCashflow}</th>
+                  <th className="py-3 px-3.5">{copy.endAssets}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100 font-mono font-medium text-slate-700">
                 {eventRows.length > 0 ? (
                   eventRows.map((row) => (
-                    <tr key={row.year}>
-                      <td><strong>{row.year}</strong><small>{row.primaryAge}{copy.age}</small></td>
-                      <td><span className="m3-chip primary">{row.eventNames.join(' · ')}</span></td>
-                      <td>{formatMoney(row.totalIncome, locale)}</td>
-                      <td className="negative">{formatMoney(row.totalExpense, locale)}</td>
-                      <td className={row.netCashFlow < 0 ? 'negative' : 'positive'}>{formatMoney(row.netCashFlow, locale)}</td>
-                      <td className={row.endAssets < 0 ? 'negative strong' : 'strong'}>{formatMoney(row.endAssets, locale)}</td>
+                    <tr key={row.year} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="py-2.5 px-3.5 text-left font-sans">
+                        <strong className="text-slate-900 font-bold">{row.year}</strong>
+                        <span className="text-[10px] text-slate-400 block">{row.primaryAge}{copy.age}</span>
+                      </td>
+                      <td className="py-2.5 px-3.5 text-left font-sans">
+                        <Badge variant="secondary" className="text-[10px] font-semibold bg-sky-50 text-sky-700 border border-sky-100">
+                          {row.eventNames.join(' · ')}
+                        </Badge>
+                      </td>
+                      <td className="py-2.5 px-3.5">{formatMoney(row.totalIncome, locale)}</td>
+                      <td className="py-2.5 px-3.5 text-rose-600 font-semibold">{formatMoney(row.totalExpense, locale)}</td>
+                      <td className={cn('py-2.5 px-3.5 font-semibold', row.netCashFlow < 0 ? 'text-rose-600' : 'text-emerald-600')}>
+                        {formatMoney(row.netCashFlow, locale)}
+                      </td>
+                      <td className={cn('py-2.5 px-3.5 font-bold', row.endAssets < 0 ? 'text-rose-600' : 'text-slate-900')}>
+                        {formatMoney(row.endAssets, locale)}
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', color: '#747775', padding: '2rem' }}>
+                    <td colSpan={6} className="py-8 text-center text-slate-400 font-sans text-xs">
                       {copy.noEvent}
                     </td>
                   </tr>
@@ -397,27 +425,34 @@ export function Dashboard({ output, locale, copy, plan, onPlanChange }: Props) {
 
         {/* Tab 3: Milestones Summary Table */}
         {activeTableTab === 'milestones' && (
-          <div className="table-scroll gf-table-scroll">
-            <table className="gf-table m3-table">
+          <div className="overflow-x-auto max-h-[440px] rounded-xl border border-slate-200/80">
+            <table className="w-full text-xs text-right border-collapse">
               <thead>
-                <tr>
-                  <th>{copy.yearAge}</th>
-                  <th>{copy.startAssets}</th>
-                  <th>{copy.afterTaxIncome}</th>
-                  <th>{copy.totalExpense}</th>
-                  <th>{copy.investmentGain}</th>
-                  <th>{copy.endAssets}</th>
+                <tr className="bg-slate-50/90 text-slate-500 font-bold uppercase tracking-wider text-[11px] border-b border-slate-200/80 sticky top-0 z-10 backdrop-blur-xs">
+                  <th className="py-3 px-3.5 text-left">{copy.yearAge}</th>
+                  <th className="py-3 px-3.5">{copy.startAssets}</th>
+                  <th className="py-3 px-3.5">{copy.afterTaxIncome}</th>
+                  <th className="py-3 px-3.5">{copy.totalExpense}</th>
+                  <th className="py-3 px-3.5">{copy.investmentGain}</th>
+                  <th className="py-3 px-3.5">{copy.endAssets}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100 font-mono font-medium text-slate-700">
                 {milestoneRows.map((row) => (
-                  <tr key={row.year}>
-                    <td><strong>{row.year}</strong><small>{row.primaryAge}{copy.age}</small></td>
-                    <td>{formatMoney(row.startAssets, locale)}</td>
-                    <td>{formatMoney(row.totalIncome, locale)}</td>
-                    <td>{formatMoney(row.totalExpense, locale)}</td>
-                    <td className={row.investmentGain < 0 ? 'negative' : 'positive'}>{formatMoney(row.investmentGain, locale)}</td>
-                    <td className={row.endAssets < 0 ? 'negative strong' : 'strong'}>{formatMoney(row.endAssets, locale)}</td>
+                  <tr key={row.year} className="hover:bg-slate-50/70 transition-colors">
+                    <td className="py-2.5 px-3.5 text-left font-sans">
+                      <strong className="text-slate-900 font-bold">{row.year}</strong>
+                      <span className="text-[10px] text-slate-400 block">{row.primaryAge}{copy.age}</span>
+                    </td>
+                    <td className="py-2.5 px-3.5">{formatMoney(row.startAssets, locale)}</td>
+                    <td className="py-2.5 px-3.5">{formatMoney(row.totalIncome, locale)}</td>
+                    <td className="py-2.5 px-3.5">{formatMoney(row.totalExpense, locale)}</td>
+                    <td className={cn('py-2.5 px-3.5', row.investmentGain < 0 ? 'text-rose-600 font-bold' : 'text-emerald-600 font-semibold')}>
+                      {formatMoney(row.investmentGain, locale)}
+                    </td>
+                    <td className={cn('py-2.5 px-3.5 font-bold', row.endAssets < 0 ? 'text-rose-600' : 'text-slate-900')}>
+                      {formatMoney(row.endAssets, locale)}
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -501,12 +501,12 @@ details[open].bottom-audit-ledger .summary-chevron {
 }
 
 .m3-table th {
-  background: #f8faee;
-  color: #444746;
+  background: #f8fafc;
+  color: #475569;
   font-weight: 600;
   text-align: right;
   padding: 10px 14px;
-  border-bottom: 1px solid #dadce0;
+  border-bottom: 1px solid #e2e8f0;
   white-space: nowrap;
 }
 

@@ -6,6 +6,7 @@ import { NumberField, SectionHeading } from './Fields'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 
 import { templates } from '../data/defaultPlan'
 
@@ -182,18 +183,139 @@ export function InputPanel({ plan, onChange, locale, copy }: Props) {
           </section>
 
           {/* Quicken Step 06: Special Events & Loans */}
-          <section style={{ borderTop: '1px solid #e0e4ec', paddingTop: 16 }}>
+          <section className="pt-4 border-t border-slate-100">
             <SectionHeading icon={<CalendarDays />} title={locale === 'ja' ? '06. 特別イベント・大型支出 (Special Events & Loans)' : '06. 重大事件与按揭借款 (Special Events & Loans)'} />
-            <p className="section-help">{copy.eventHelp}</p>
-            <div className="event-stack">
-              {plan.events.map((event) => <article className={`event-editor ${event.type}`} key={event.id}>
-                <div className="event-editor-head"><div className="event-type-toggle"><button className={event.type === 'expense' ? 'active' : ''} type="button" onClick={() => updateEvent(event.id, { type: 'expense', taxable: false })}>{copy.expense}</button><button className={event.type === 'income' ? 'active' : ''} type="button" onClick={() => updateEvent(event.id, { type: 'income' })}>{copy.income}</button></div><button aria-label={`${copy.delete} ${event.name}`} type="button" onClick={() => onChange({ ...plan, events: plan.events.filter((item) => item.id !== event.id) })}><Trash2 /></button></div>
-                <label className="event-name"><span>{copy.eventName}</span><input value={event.name} onChange={(e) => updateEvent(event.id, { name: e.target.value })} /></label>
-                <div className="event-fields"><NumberField label={copy.eventStart} value={event.startYear} min={plan.assumptions.startYear} max={plan.assumptions.startYear + 120} onChange={(startYear) => updateEvent(event.id, { startYear })} /><NumberField label={copy.duration} value={event.duration} min={1} max={100} suffix={copy.year} onChange={(duration) => updateEvent(event.id, { duration })} /><NumberField label={copy.annualAmount} value={event.annualAmount} min={0} step={100_000} scale={10_000} suffix={copy.moneyUnit} onChange={(annualAmount) => updateEvent(event.id, { annualAmount })} /></div>
-                <div className="event-meta"><label><span>{copy.relatedMember}</span><select value={event.memberId ?? ''} onChange={(e) => updateEvent(event.id, { memberId: e.target.value || null })}><option value="">{copy.householdShared}</option>{[...plan.adults, ...plan.children].map((member) => <option value={member.id} key={member.id}>{member.name}</option>)}</select></label>{event.type === 'income' ? <label className="check-field"><input type="checkbox" checked={event.taxable} onChange={(e) => updateEvent(event.id, { taxable: e.target.checked })} /><span>{copy.taxable}</span></label> : null}</div>
-              </article>)}
+            <p className="text-xs text-slate-500 mb-3.5 leading-relaxed">{copy.eventHelp}</p>
+            <div className="flex flex-col gap-3">
+              {plan.events.map((event) => (
+                <article
+                  key={event.id}
+                  className={cn(
+                    'group relative p-3.5 rounded-xl border transition-all flex flex-col gap-3 bg-white shadow-2xs',
+                    event.type === 'expense'
+                      ? 'border-slate-200/90 hover:border-rose-300'
+                      : 'border-slate-200/90 hover:border-emerald-300'
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    {/* Modern Pill Segmented Control for Expense / Income */}
+                    <div className="inline-flex p-0.5 bg-slate-100 rounded-lg border border-slate-200/70">
+                      <button
+                        type="button"
+                        onClick={() => updateEvent(event.id, { type: 'expense', taxable: false })}
+                        className={cn(
+                          'px-2.5 py-1 text-xs font-bold rounded-md transition-all cursor-pointer',
+                          event.type === 'expense'
+                            ? 'bg-rose-500 text-white shadow-2xs'
+                            : 'text-slate-500 hover:text-slate-700'
+                        )}
+                      >
+                        {copy.expense}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => updateEvent(event.id, { type: 'income' })}
+                        className={cn(
+                          'px-2.5 py-1 text-xs font-bold rounded-md transition-all cursor-pointer',
+                          event.type === 'income'
+                            ? 'bg-emerald-600 text-white shadow-2xs'
+                            : 'text-slate-500 hover:text-slate-700'
+                        )}
+                      >
+                        {copy.income}
+                      </button>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg"
+                      aria-label={`${copy.delete} ${event.name}`}
+                      onClick={() => onChange({ ...plan, events: plan.events.filter((item) => item.id !== event.id) })}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+
+                  {/* Event Name Input */}
+                  <label className="flex flex-col gap-1">
+                    <span className="text-xs font-semibold text-slate-700">{copy.eventName}</span>
+                    <Input
+                      value={event.name}
+                      onChange={(e) => updateEvent(event.id, { name: e.target.value })}
+                      className="h-9 text-xs font-semibold bg-slate-50/50 border-slate-200 focus:bg-white focus:border-sky-500 rounded-lg"
+                    />
+                  </label>
+
+                  {/* 3-Column Inputs: Start Year, Duration, Annual Amount */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <NumberField
+                      label={copy.eventStart}
+                      value={event.startYear}
+                      min={plan.assumptions.startYear}
+                      max={plan.assumptions.startYear + 120}
+                      onChange={(startYear) => updateEvent(event.id, { startYear })}
+                    />
+                    <NumberField
+                      label={copy.duration}
+                      value={event.duration}
+                      min={1}
+                      max={100}
+                      suffix={copy.year}
+                      onChange={(duration) => updateEvent(event.id, { duration })}
+                    />
+                    <NumberField
+                      label={copy.annualAmount}
+                      value={event.annualAmount}
+                      min={0}
+                      step={100_000}
+                      scale={10_000}
+                      suffix={copy.moneyUnit}
+                      onChange={(annualAmount) => updateEvent(event.id, { annualAmount })}
+                    />
+                  </div>
+
+                  {/* Related Member & Taxable Checkbox */}
+                  <div className="flex items-center justify-between gap-3 pt-1 border-t border-slate-100">
+                    <label className="flex items-center gap-2 text-xs text-slate-600 font-medium">
+                      <span>{copy.relatedMember}</span>
+                      <select
+                        value={event.memberId ?? ''}
+                        onChange={(e) => updateEvent(event.id, { memberId: e.target.value || null })}
+                        className="h-8 text-xs font-medium bg-slate-50 border border-slate-200 rounded-lg px-2 text-slate-700 focus:bg-white focus:border-sky-500 outline-none"
+                      >
+                        <option value="">{copy.householdShared}</option>
+                        {[...plan.adults, ...plan.children].map((member) => (
+                          <option value={member.id} key={member.id}>{member.name}</option>
+                        ))}
+                      </select>
+                    </label>
+                    {event.type === 'income' ? (
+                      <label className="flex items-center gap-1.5 text-xs text-slate-600 font-medium cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={event.taxable}
+                          onChange={(e) => updateEvent(event.id, { taxable: e.target.checked })}
+                          className="rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                        />
+                        <span>{copy.taxable}</span>
+                      </label>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
             </div>
-            <button className="add-event-button" type="button" onClick={addEvent} style={{ marginTop: 10 }}><Plus />{copy.addEvent}</button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addEvent}
+              className="w-full mt-3 h-9 text-xs font-semibold border-dashed border-sky-300 bg-sky-50/50 text-sky-700 hover:bg-sky-100 hover:border-sky-400 gap-1.5 rounded-xl cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>{copy.addEvent}</span>
+            </Button>
           </section>
         </div>
     </aside>
