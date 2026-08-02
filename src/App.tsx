@@ -3,7 +3,6 @@ import { Dashboard } from './components/Dashboard'
 import { InputPanel } from './components/InputPanel'
 import { ChatAssistant } from './components/ChatAssistant'
 import { LifeOsNextSteps } from './components/LifeOsNextSteps'
-import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { LifeOsNav } from './components/LifeOsNav'
 import { buildPlanOutput } from './engine/planner'
 import { getCopy, type Locale } from './i18n'
@@ -90,18 +89,15 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <header className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xs mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="brand-block">
-          <div>
-            <LifeOsNav locale={locale} portfolioUrl={portfolioUrl} taxUrl={taxUrl} />
-            <h1 className="text-xl font-black text-slate-900 tracking-tight m-0">{copy.appTitle}</h1>
-            <p className="text-xs text-slate-500 m-0 mt-0.5">{copy.appSubtitle}</p>
-          </div>
-        </div>
-        <div className="header-actions self-start md:self-auto">
-          <LanguageSwitcher locale={locale} onLocaleChange={setLocale} />
-        </div>
-      </header>
+      <LifeOsNav
+        locale={locale}
+        onLocaleChange={setLocale}
+        portfolioUrl={portfolioUrl}
+        taxUrl={taxUrl}
+        plan={plan}
+        onPlanChange={setPlan}
+        copy={copy}
+      />
 
       <main className="planner-layout">
         <InputPanel plan={plan} onChange={setPlan} locale={locale} copy={copy} />
